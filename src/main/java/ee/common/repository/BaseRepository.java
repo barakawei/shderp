@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import ee.common.search.Searchable;
@@ -30,7 +31,7 @@ import ee.common.search.Searchable;
  * <p>Version: 1.0
  */
 @NoRepositoryBean
-public interface BaseRepository<M, ID extends Serializable> extends JpaRepository<M, ID> {
+public interface BaseRepository<M, ID extends Serializable> extends JpaRepository<M, ID>{
 
     /**
      * 根据主键删除
@@ -77,5 +78,7 @@ public interface BaseRepository<M, ID extends Serializable> extends JpaRepositor
      * @return
      */
     public long count(Searchable searchable);
+
+    public RepositoryHelper getRepositoryHelper();
 
 }

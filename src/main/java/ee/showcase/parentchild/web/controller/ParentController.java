@@ -74,7 +74,7 @@ public class ParentController extends BaseCRUDController<Parent, Long> {
     public String create(
             Model model,
             @Valid @ModelAttribute("parent") Parent parent, BindingResult result,
-            @ParamAttribute("childList") List<Child> childList,
+            @ParamAttribute("childList") List<Child> childList,           
             RedirectAttributes redirectAttributes) {
 
         if (hasError(parent, result)) {

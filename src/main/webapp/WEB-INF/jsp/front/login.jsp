@@ -1,16 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/WEB-INF/jsp/common/taglibs.jspf" %>
-<es:contentHeader title="用户登录 Easy-Scaffold脚手架" index="true"/>
+<es:contentHeader title="圣华盾ERP系统" index="true"/>
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
-        <a class="brand" href="#">&nbsp;&nbsp;es脚手架</a>
-        <ul class="nav">
-            <li><a href="http://sishuok.com" target="_blank">私塾在线</a></li>
-            <li class="active"><a href="#">登录</a></li>
-            <li><a href="http://jinnianshilongnian.iteye.com" target="_blank">我的博客</a></li>
-            <li><a href="https://github.com/zhangkaitao/es" target="_blank">github</a></li>
-        </ul>
-        <a class="brand" style="float: right" href="mailto:zhangkaitao0503@gmail.com" target="_blank">&nbsp;&nbsp;问题反馈</a>
+        <a class="brand" href="#">&nbsp;&nbsp;圣华盾ERP系统</a>
     </div>
 </div>
 
@@ -26,7 +19,7 @@
             <form id="loginForm" method="post" class="form-horizontal">
             <es:BackURL hiddenInput="true"/>
             <div class="control-group">
-                <label for="username">用户名、邮箱或手机号</label>
+                <label for="username">用户名</label>
                 <div class="input-prepend">
                     <span class="add-on icon-user"></span>
                     <input type="text" id="username" name="username" value="${param.username}"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<configuration debug="false">
+<configuration debug="true">
+    <property name="log.dir" value="/Users/baraka/Documents/java/log" />
 
     <!-- 控制台 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -13,7 +14,20 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
             <!-- log.dir 在maven profile里配置 -->
-            <fileNamePattern>${log.dir}/es-error-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${log.dir}/ee-error-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- sql日志 appender  -->
+    <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <!-- log.dir 在maven profile里配置 -->
+            <fileNamePattern>${log.dir}/ee-sql-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
@@ -25,7 +39,7 @@
     <appender name="ACCESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log.dir}/es-access-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${log.dir}/ee-access-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
@@ -38,7 +52,7 @@
     <appender name="SYS-USER" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log.dir}/es-sys-user-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${log.dir}/ee-sys-user-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
@@ -66,25 +80,24 @@
         <appender-ref ref="SYS-USER"/>
     </logger>
 
-    <!-- cache -->
+    <!--
+
     <logger name="ee.extra.aop" level="info">
-            <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
-    
-    <!-- ddl -->
+
     <logger name="org.hibernate.tool.hbm2ddl" level="info">
-            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="sql"/>
     </logger>
-    
+
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE">
-            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="sql"/>
     </logger>
     <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE">
-            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="sql"/>
     </logger>
-    
-    
-    
+    -->
+
 
 </configuration>
 

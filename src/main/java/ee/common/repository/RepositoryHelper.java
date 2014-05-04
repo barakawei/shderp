@@ -262,7 +262,6 @@ public class RepositoryHelper {
         return query.executeUpdate();
     }
 
-
     /**
      * 按顺序设置Query参数
      *

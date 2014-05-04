@@ -1,9 +1,11 @@
 /build/
 /.gradle/
 /.settings/
+/.idea/
 .DS_Store
 /.git/
 *.log
 *.class
 *.tmp
 *.jar
+

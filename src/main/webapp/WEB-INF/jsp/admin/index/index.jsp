@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/WEB-INF/jsp/common/taglibs.jspf"%>
-<es:contentHeader title="Easy-Scaffold脚手架" index="true"/>
+<es:contentHeader title="圣华盾ERP系统" index="true"/>
 
     <ul id="tabs-menu" class="dropdown-menu">
         <li><a class="close-current" href="#">关闭</a></li>

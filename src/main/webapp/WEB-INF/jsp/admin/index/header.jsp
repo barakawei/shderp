@@ -3,7 +3,7 @@
 <div class="lead header">
   <div class="pull-left">
       <%--<img src="${ctx}/static/images/favicon.png"/>--%>
-      <%--&nbsp;&nbsp;Easy-Scaffold项目开发脚手架——基于主流Java开源技术构建--%>
+      <%--&nbsp;&nbsp;圣华盾ERP系统--%>
   </div>
 </div>
 

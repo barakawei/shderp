@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ee.common.repository.BaseRepository;
+import ee.common.repository.RepositoryHelper;
+import ee.common.repository.support.SimpleBaseRepository;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,6 +37,8 @@ import ee.sys.user.exception.UserPasswordNotMatchException;
 import ee.sys.user.repository.UserRepository;
 import ee.sys.user.utils.UserLogUtils;
 
+import javax.persistence.Query;
+
 /**
  * <p>User: Zhang Kaitao
  * <p>Date: 13-2-4 下午3:01
@@ -55,6 +60,15 @@ public class UserService extends BaseService<User, Long> {
 
     public void setPasswordService(PasswordService passwordService) {
         this.passwordService = passwordService;
+    }
+
+    public List<User> findByJob(String[] jobs){
+        RepositoryHelper rh = getUserRepository().getRepositoryHelper();
+        String sql ="select u.* from sys_user u left join sys_user_organization_job uoj on(u.id = uoj.user_id) left join sys_job job on(job.id = uoj.job_id) where job.name in ('销售总监','销售总监助理')";
+        Query query = rh.getEntityManager().createNativeQuery(sql,User.class);
+        //query.setParameter("names",jobs);
+        List<User> users = query.getResultList();
+        return users;
     }
 
     @Override

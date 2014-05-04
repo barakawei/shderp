@@ -1,5 +1,6 @@
 <!--最终合并为1个css 和 1个js-->
 <!-- Le styles -->
+
 <link type="text/css" href="${ctx}/static/comp/jquery-ui-bootstrap/css/bootstrap.css?2" rel="stylesheet">
 
 <link type="text/css" href="${ctx}/static/comp/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.3.custom.css?3" rel="stylesheet"/>
@@ -28,3 +29,8 @@
 </script>
 
 <script src="${ctx}/static/comp/jquery-ui-bootstrap/js/jquery-1.10.1.min.js?1" type="text/javascript"></script>
+
+<link rel="stylesheet" href="${ctx}/static/comp/font-awesome-4.0.3/css/font-awesome.min.css">
+<!--<link href="${ctx}/static/comp/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">-->
+<!--<link href="${ctx}/static/comp/jqueryui-editable/css/jqueryui-editable.css" rel="stylesheet">-->
+

@@ -27,6 +27,21 @@ public class RoleService extends BaseService<Role, Long> {
         return (RoleRepository) baseRepository;
     }
 
+
+    public void delete(Long id){
+        Role r = baseRepository.findOne(id);
+        r.getResourcePermissions().clear();
+        baseRepository.save(r);
+        baseRepository.delete(r);
+    }
+
+    public void delete(Long[] ids){
+        for(Long id :ids){
+            this.delete(id);
+        }
+    }
+
+
     @Override
     public Role update(Role role) {
         List<RoleResourcePermission> localResourcePermissions = role.getResourcePermissions();

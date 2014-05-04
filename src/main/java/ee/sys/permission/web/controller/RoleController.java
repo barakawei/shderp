@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import ee.sys.permission.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +44,9 @@ public class RoleController extends BaseCRUDController<Role, Long> {
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private RoleService roleService;
+
     public RoleController() {
         setResourceIdentity("sys:role");
     }
@@ -55,6 +59,22 @@ public class RoleController extends BaseCRUDController<Role, Long> {
         Searchable searchable = Searchable.newSearchable();
 //        searchable.addSearchFilter("show", SearchOperator.eq, true);
         model.addAttribute("permissions", permissionService.findAllWithNoPageNoSort(searchable));
+    }
+
+    @RequestMapping(value = "batch/delete", method = {RequestMethod.GET, RequestMethod.POST})
+    @Override
+    public String deleteInBatch(
+            @RequestParam(value = "ids", required = false) Long[] ids,
+            @RequestParam(value = Constants.BACK_URL, required = false) String backURL,
+            RedirectAttributes redirectAttributes) {
+
+
+        if (permissionList != null) {
+            this.permissionList.assertHasDeletePermission();
+        }
+        roleService.delete(ids);
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "删除成功");
+        return redirectToUrl(backURL);
     }
 
 

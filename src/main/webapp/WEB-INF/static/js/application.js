@@ -1803,6 +1803,10 @@ $.table = {
         //初始化删除和修改按钮
         $.table.initDeleteSelected(table);
         $.table.initUpdateSelected(table);
+        $.table.initSubmitSelected(table);
+        $.table.initAuditSelected(table);
+        $.table.initRejectSelected(table);
+        $.table.initConfirmSelected(table);
         $.table.initCreate(table);
 
         //初始化checkbox
@@ -2228,6 +2232,89 @@ $.table = {
             window.location.href = urlPrefix + "/" + id + "/update?BackURL=" + $.table.encodeTableURL($table);
         });
     },
+    //add by qxw
+    initSubmitSelected : function($table, urlPrefix) {
+        if(!$table || !$table.length) {
+            return;
+        }
+
+        var $btn = $table.closest("[data-table='" + $table.attr("id") + "']").find(".btn-submit:not(.btn-custom)");
+        urlPrefix = $.table.formatUrlPrefix(urlPrefix, $table);
+        $btn.off("click").on("click", function() {
+            var checkbox = $.table.getAllSelectedCheckbox($table);
+            if(!checkbox.length)  return;
+
+            $.app.confirm({
+                message: "提交生产链接单？",
+                ok : function() {
+                    window.location.href =
+                        urlPrefix + "/batch/submit?" + checkbox.serialize() + "&BackURL=" + $.table.encodeTableURL($table);
+                }
+            });
+        });
+    },
+        initAuditSelected : function($table, urlPrefix) {
+            if(!$table || !$table.length) {
+                return;
+            }
+
+            var $btn = $table.closest("[data-table='" + $table.attr("id") + "']").find(".btn-audit:not(.btn-custom)");
+            urlPrefix = $.table.formatUrlPrefix(urlPrefix, $table);
+            $btn.off("click").on("click", function() {
+                var checkbox = $.table.getAllSelectedCheckbox($table);
+                if(!checkbox.length)  return;
+
+                $.app.confirm({
+                    message: "确认生产链接单？",
+                    ok : function() {
+                        window.location.href =
+                            urlPrefix + "/batch/audit?" + checkbox.serialize() + "&BackURL=" + $.table.encodeTableURL($table);
+                    }
+                });
+            });
+        },
+
+                initRejectSelected : function($table, urlPrefix) {
+                    if(!$table || !$table.length) {
+                        return;
+                    }
+
+                    var $btn = $table.closest("[data-table='" + $table.attr("id") + "']").find(".btn-reject:not(.btn-custom)");
+                    urlPrefix = $.table.formatUrlPrefix(urlPrefix, $table);
+                    $btn.off("click").on("click", function() {
+                        var checkbox = $.table.getAllSelectedCheckbox($table);
+                        if(!checkbox.length)  return;
+
+                        $.app.confirm({
+                            message: "不确认生产链接单？",
+                            ok : function() {
+                                window.location.href =
+                                    urlPrefix + "/batch/reject?" + checkbox.serialize() + "&BackURL=" + $.table.encodeTableURL($table);
+                            }
+                        });
+                    });
+                },
+                initConfirmSelected : function($table, urlPrefix) {
+                    if(!$table || !$table.length) {
+                        return;
+                    }
+
+                    var $btn = $table.closest("[data-table='" + $table.attr("id") + "']").find(".btn-confirm:not(.btn-custom)");
+                    urlPrefix = $.table.formatUrlPrefix(urlPrefix, $table);
+                    $btn.off("click").on("click", function() {
+                        var checkbox = $.table.getAllSelectedCheckbox($table);
+                        if(!checkbox.length)  return;
+
+                        $.app.confirm({
+                            message: "确认生产链接单？",
+                            ok : function() {
+                                window.location.href =
+                                    urlPrefix + "/batch/confirm?" + checkbox.serialize() + "&BackURL=" + $.table.encodeTableURL($table);
+                            }
+                        });
+                    });
+                },
+
     initCreate : function($table, urlPrefix) {
         if(!$table || !$table.length) {
             return;
@@ -2249,7 +2336,7 @@ $.table = {
         if(!$table || !$table.length) {
             return;
         }
-        $table.closest("[data-table=" + $table.attr("id") + "]").find(".btn").not(".btn-custom,.btn-create,.btn-update,.btn-delete").each(function() {
+        $table.closest("[data-table=" + $table.attr("id") + "]").find(".btn").not(".btn-custom,.btn-create,.btn-update,.btn-delete,.btn-submit").each(function() {
             var $btn = $(this);
             var url = $btn.attr("href");
             if(!url || url.indexOf("#") == 0 || url.indexOf("javascript:") == 0) {//没有url就不处理了

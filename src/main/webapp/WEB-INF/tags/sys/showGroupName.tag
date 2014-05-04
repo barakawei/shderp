@@ -1,5 +1,5 @@
 <%@ tag import="ee.common.utils.SpringUtils" %>
-<%@ tag import="ee.group.entity.Group" %>
+<%@ tag import="ee.sys.group.entity.Group" %>
 <%@ tag import="ee.sys.group.service.GroupService" %>
 <%@ tag pageEncoding="UTF-8"%>
 <%@ attribute name="id" type="java.lang.Long" required="true" description="当前要展示的用户的id" %>

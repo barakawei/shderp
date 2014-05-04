@@ -26,6 +26,7 @@ input[type="text"], input[type="email"], input[type="tel"], input[type="search"]
     line-height: 16px;
     height: 16px;
     padding: 5px;
+    width:130px;
 }
 
 
@@ -284,7 +285,7 @@ html, body {
 
 .index-panel {
     margin:0 auto;
-    width:	1020px;
+    width:	1250px;
     height:99.7%;
     border: 1px solid #eee;
     background: #fff;
@@ -972,11 +973,11 @@ iframe[tabs="true"] {
 }
 
 .form-small .control-label {
-    width: 60px;
+    width: 80px;
 }
 
 .form-small .controls{
-    margin-left: 70px;
+    margin-left: 90px;
 }
 
 .form-medium .control-label {
@@ -1104,3 +1105,39 @@ a,input,textarea{blr:expression(this.onFocus=this.close());} /* 只支持IE，�
 a,input,textarea{blr:expression(this.onFocus=this.blur());} /* 只支持IE，过多使用效率低 */
 a:focus { -moz-outline-style: none; } /* IE不支持 */
 *:focus { outline: none; }
+
+
+
+
+
+
+
+.editable-buttons .btn-sm, .btn-xs {
+                  padding: 5px 10px;
+                  font-size: 12px;
+                  line-height: 1.5;
+                  border-radius: 3px;
+                  }
+      .editable-buttons            .btn-primary {
+                  color: #ffffff;
+                  background-color: #428bca;
+                  border-color: #357ebd;
+                  }
+             .editable-buttons        .btn {
+                  display: inline-block;
+                  padding: 6px 12px;
+                  margin-bottom: 0;
+                  font-size: 14px;
+                  font-weight: normal;
+                  line-height: 1.428571429;
+                  text-align: center;
+                  white-space: nowrap;
+                  vertical-align: middle;
+                  cursor: pointer;
+                  border: 1px solid transparent;
+                  border-radius: 4px;
+                  -webkit-user-select: none;
+                  -moz-user-select: none;
+                  -ms-user-select: none;
+                  -o-user-select: none;
+                  user-select: none;

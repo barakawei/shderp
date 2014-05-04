@@ -24,6 +24,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import ee.sys.auth.entity.Auth;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.data.domain.Page;
@@ -501,6 +502,11 @@ public class SimpleBaseRepository<M, ID extends Serializable> extends SimpleJpaR
     @Override
     public boolean exists(ID id) {
         return findOne(id) != null;
+    }
+
+    @Override
+    public RepositoryHelper getRepositoryHelper(){
+        return  repositoryHelper;
     }
 
 }

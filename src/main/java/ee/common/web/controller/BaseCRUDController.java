@@ -6,6 +6,7 @@
 package ee.common.web.controller;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.validation.Valid;
 
@@ -26,6 +27,7 @@ import ee.common.service.BaseService;
 import ee.common.utils.Constants;
 import ee.common.web.bind.annotation.PageAttribute;
 import ee.common.web.controller.permission.PermissionList;
+import shd.productionorder.entity.ProductionOrder;
 
 /**
  * 基础CRUD 控制器
@@ -73,6 +75,7 @@ public abstract class BaseCRUDController<M extends AbstractEntity, ID extends Se
     @PageAttribute(sort = "id=desc")
     public String list(Searchable searchable, Model model) {
 
+
         if (permissionList != null) {
             this.permissionList.assertHasViewPermission();
         }
@@ -100,12 +103,12 @@ public abstract class BaseCRUDController<M extends AbstractEntity, ID extends Se
 
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String view(Model model, @PathVariable("id") M m) {
+    public String view(Model model, @PathVariable("id") ID id) {
 
         if (permissionList != null) {
             this.permissionList.assertHasViewPermission();
         }
-
+        M m=baseService.findOne(id);
         setCommonData(model);
         model.addAttribute("m", m);
         model.addAttribute(Constants.OP_NAME, "查看");
