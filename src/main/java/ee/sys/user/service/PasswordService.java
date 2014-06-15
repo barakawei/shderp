@@ -78,7 +78,7 @@ public class PasswordService {
     }
 
     public boolean matches(User user, String newPassword) {
-        return user.getPassword().equals(encryptPassword(user.getUsername(), newPassword, user.getSalt()));
+        return user.getPassword().equals(encryptPassword(String.valueOf(user.getId()), newPassword, user.getSalt()));
     }
 
     public void clearLoginRecordCache(String username) {

@@ -25,9 +25,9 @@ public class SnakerService {
     }
 
     //根据流程定义ID和相关参数启动流程
-    public Order startFlowByName(String name,String userName){
+    public Order startFlowByName(String name,String userName,Map<String, Object> args){
         org.snaker.engine.entity.Process p= this.getProcessByName(name);
-        Order order = snakerEngine.startInstanceById(p.getId(),userName);
+        Order order = snakerEngine.startInstanceById(p.getId(),userName,args);
         return order;
     }
 

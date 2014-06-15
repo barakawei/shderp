@@ -5,8 +5,16 @@
 
 <div data-table="table" class="panel">
 
+
     <ul class="nav nav-tabs">
-        <li ${param['search.deleted_eq'] ne 'true' and param['search.status_eq'] ne 'blocked' ? 'class="active"' : ''}>
+        <li ${type eq 'tasks' ? 'class="active"' : ''}>
+                <a href="${ctx}/productionOrder/tasks">
+                    <i class="icon-table"></i>
+                    当前任务
+                </a>
+        </li>
+
+        <li ${type eq 'all' ? 'class="active"' : ''}>
             <a href="${ctx}/productionOrder">
                 <i class="icon-table"></i>
                 所有生产链接单列表
@@ -22,8 +30,31 @@
         <div class="span3">
             <div class="btn-group">
 
+                <c:if test="${type=='tasks'}">
+                <shiro:hasPermission name="productionOrder:audit">
+                <a class="btn btn-audit">
+                    <span class="icon-trash"></span>
+                    确认
+                </a>
+                </shiro:hasPermission>
 
 
+                <shiro:hasPermission name="productionOrder:reject">
+                <a class="btn btn-reject">
+                    <span class="icon-trash"></span>
+                    不确认
+                </a>
+                 </shiro:hasPermission>
+
+                 <shiro:hasPermission name="productionOrder:confirm">
+                                <a class="btn btn-confirm">
+                                    <span class="icon-trash"></span>
+                                    确认
+                                </a>
+                  </shiro:hasPermission>
+                </c:if>
+
+                 <c:if test="${type=='tasks'}">
                 <shiro:hasPermission name="productionOrder:create">
                 <a class="btn no-disabled btn-create">
                     <span class="icon-file-alt"></span>
@@ -52,7 +83,11 @@
                     删除
                 </a>
                 </shiro:hasPermission>
-
+                 </c:if>
+                <a id="exportt" class="btn btn-export">
+                    <span class="icon-edit"></span>
+                    导出EXCEL
+                </a>
 
             </div>
         </div>
@@ -90,7 +125,7 @@
                 </td>
                 <td>${m.serialNumber}</td>
                 <td>${m.customerName}</td>
-                <td>${m.contractDeliveryDate}</td>
+                <td><fmt:formatDate value="${m.contractDeliveryDate}" pattern="yyyy-MM-dd"/></td>
                 <td>
                  <c:choose>
                             <c:when test="${m.status==0}">
@@ -121,11 +156,4 @@
     <es:page page="${page}"/>
 </div>
 <es:contentFooter/>
-<%@include file="/WEB-INF/jsp/common/admin/import-sys-js.jspf"%>
-<script type="text/javascript">
-    $(function() {
-       // $.sys.user.initUserListButton();
-       // $.app.toggleLoadTable($("#table"), "${ctx}/admin/sys/user/{parentId}/organizations")
-    });
-</script>
 

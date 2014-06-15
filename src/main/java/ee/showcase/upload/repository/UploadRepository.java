@@ -6,15 +6,15 @@
 package ee.showcase.upload.repository;
 
 import ee.common.repository.BaseRepository;
-import ee.showcase.upload.entity.Upload;
+import ee.showcase.upload.entity.UploadFile;
 
 /**
  * <p>User: Zhang Kaitao
  * <p>Date: 13-2-4 下午3:00
  * <p>Version: 1.0
  */
-public interface UploadRepository extends BaseRepository<Upload, Long> {
+public interface UploadRepository extends BaseRepository<UploadFile, Long> {
 
-    Upload findByName(String name);
+    UploadFile findByName(String name);
 
 }

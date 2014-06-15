@@ -59,6 +59,7 @@ public class IndexController {
         //未读消息
         Long messageUnreadCount = messageService.countUnread(loginUser.getId());
         model.addAttribute("messageUnreadCount", messageUnreadCount);
+        model.addAttribute("user", loginUser);
 
         //最近3天的日历
         model.addAttribute("calendarCount", calendarService.countRecentlyCalendar(loginUser.getId(), 2));

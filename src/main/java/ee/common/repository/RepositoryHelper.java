@@ -6,11 +6,10 @@
 package ee.common.repository;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
+import javax.persistence.*;
 
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +23,7 @@ import org.springframework.util.Assert;
 import ee.common.repository.annotation.EnableQueryCache;
 import ee.common.repository.support.SearchCallback;
 import ee.common.search.Searchable;
+import shd.common.ResultSetMapping;
 
 /**
  * 仓库辅助类
@@ -31,7 +31,7 @@ import ee.common.search.Searchable;
  * <p>Date: 13-4-14 下午5:28
  * <p>Version: 1.0
  */
-public class RepositoryHelper {
+public class RepositoryHelper{
 
     private static EntityManager entityManager;
     private Class<?> entityClass;
@@ -100,6 +100,19 @@ public class RepositoryHelper {
         return query.getResultList();
     }
 
+    public List<Object> findByNative(final String ql, final Searchable searchable, final SearchCallback searchCallback) {
+
+        //assertConverted(searchable);
+        StringBuilder s = new StringBuilder(ql);
+        searchCallback.prepareQL(s, searchable);
+        searchCallback.prepareOrder(s, searchable);
+        Query query = getEntityManager().createNativeQuery(s.toString());
+        searchCallback.setValues(query, searchable);
+        searchCallback.setPageable(query, searchable);
+
+        return query.getResultList();
+    }
+
     /**
      * <p>按条件统计<br/>
      * 测试用例请参考：{@see ee.common.repository.UserRepositoryImplForCustomSearchIT}
@@ -121,6 +134,17 @@ public class RepositoryHelper {
         searchCallback.setValues(query, searchable);
 
         return (Long) query.getSingleResult();
+    }
+    public long countByNative(final String ql, final Searchable searchable, final SearchCallback searchCallback) {
+
+        //assertConverted(searchable);
+
+        StringBuilder s = new StringBuilder(ql);
+        searchCallback.prepareQL(s, searchable);
+        Query query = getEntityManager().createNativeQuery(s.toString());
+        searchCallback.setValues(query, searchable);
+
+        return ((BigInteger) query.getSingleResult()).longValue();
     }
 
     /**

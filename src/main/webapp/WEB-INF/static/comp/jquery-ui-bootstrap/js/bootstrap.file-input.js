@@ -14,8 +14,8 @@ $.customFileInput = function() {
         if ($input.prop('title')) {
             btnTitle = $input.prop('title');
         }
-        $input.wrap("<div class='file-input'></div>");
-        var $btn = $('<label for="' + $input.prop("id") + '" class="btn">' + btnTitle + '</label>');
+        $input.wrap("<div class='file-input' style='display:inline;'></div>");
+        var $btn = $('<label for="' + $input.prop("id") + '" class="btn no-disabled">' + btnTitle + '</label>');
         $input.before($btn);
         $btn.append($input);
 

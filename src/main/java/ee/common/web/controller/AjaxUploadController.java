@@ -115,7 +115,7 @@ public class AjaxUploadController {
         String filePath = FileUploadUtils.extractUploadDir(request) + "/" + filename;
 
         File file = new File(filePath);
-        file.deleteOnExit();
+        file.delete();
 
         return "";
     }

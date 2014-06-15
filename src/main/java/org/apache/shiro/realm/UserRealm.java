@@ -58,13 +58,12 @@ public class UserRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        String username = (String) principals.getPrimaryPrincipal();
-        User user = userService.findByUsername(username);
+        String userId = (String) principals.getPrimaryPrincipal();
+        User user = userService.findOne(Long.parseLong(userId));
 
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         authorizationInfo.setRoles(userAuthService.findStringRoles(user));
         authorizationInfo.setStringPermissions(userAuthService.findStringPermissions(user));
-
         return authorizationInfo;
     }
 
@@ -135,7 +134,7 @@ public class UserRealm extends AuthorizingRealm {
             throw new AuthenticationException(new UserException("user.unknown.error", null));
         }
 
-        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user.getUsername(), password.toCharArray(), getName());
+        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(String.valueOf(user.getId()), password.toCharArray(), getName());
         return info;
     }
 

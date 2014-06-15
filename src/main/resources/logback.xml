@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<configuration debug="true">
-    <property name="log.dir" value="/Users/baraka/Documents/java/log" />
+<configuration debug="false">
+    <property name="log.dir" value="../log" />
 
     <!-- 控制台 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -23,7 +23,7 @@
         </encoder>
     </appender>
     <!-- sql日志 appender  -->
-    <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="SQL" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
             <!-- log.dir 在maven profile里配置 -->
@@ -80,15 +80,17 @@
         <appender-ref ref="SYS-USER"/>
     </logger>
 
+    <logger name="org.hibernate.tool.hbm2ddl" level="info">
+        <appender-ref ref="SQL"/>
+    </logger>
+
     <!--
 
     <logger name="ee.extra.aop" level="info">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.hibernate.tool.hbm2ddl" level="info">
-            <appender-ref ref="sql"/>
-    </logger>
+
 
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE">
             <appender-ref ref="sql"/>

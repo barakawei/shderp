@@ -212,7 +212,7 @@ public class FileUploadUtils {
      */
     private static final String datePath() {
         Date now = new Date();
-        return DateFormatUtils.format(now, "yyyy/MM/dd");
+        return DateFormatUtils.format(now, "yyyy-MM-dd");
     }
 
 

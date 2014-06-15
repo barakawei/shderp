@@ -4,6 +4,9 @@
     <esform:label path="search.orderNumber_like">订单号</esform:label>
     <esform:input path="search.orderNumber_like" cssClass="input-medium" placeholder="模糊匹配"/>
     &nbsp;&nbsp;
+    <esform:label path="search.customerName_like">客户名称</esform:label>
+    <esform:input path="search.customerName_like" cssClass="input-medium" placeholder="模糊匹配"/>
+    &nbsp;&nbsp;
     <input type="submit" class="btn" value="查询"/>
     <a class="btn btn-link btn-clear-search">清空</a>
 

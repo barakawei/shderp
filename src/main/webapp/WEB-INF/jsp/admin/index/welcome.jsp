@@ -32,9 +32,7 @@
 <div  style="margin: 5px;margin-top: 10px;">
     <div class="row-fluid tool ui-toolbar">
         <div style="padding-left: 10px;">
-            <a class="btn btn-link btn-view-info" data-toggle="tooltip" data-placement="bottom" title="点击查看个人资料/修改密码">
                 <sys:showLoginUsername/>，欢迎您！
-            </a>
 
         </div>
     </div>

@@ -5,12 +5,22 @@
  */
 package shd.productionorder.web.controller;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import ee.sys.organization.entity.Job;
+import ee.sys.organization.service.JobService;
 import ee.sys.user.entity.User;
+import ee.sys.user.entity.UserOrganizationJob;
 import ee.sys.user.web.bind.annotation.CurrentUser;
+import net.sf.jxls.transformer.XLSTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,8 +37,12 @@ import ee.common.search.Searchable;
 import ee.common.utils.Constants;
 import ee.common.web.bind.annotation.PageAttribute;
 import ee.common.web.controller.BaseController;
+import shd.purchaseorder.entity.Purchase;
+import shd.purchaseorder.entity.PurchaseOrder;
 
-import java.util.List;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Controller
@@ -37,37 +51,100 @@ public class ProductionOrderController extends BaseController<ProductionOrder, L
 
     @Autowired
     private ProductionOrderService poService;
+
+    @Autowired
+    private JobService jobService;
+
+    @RequestMapping("/{id}/export")
+    public void exportExcel(HttpServletResponse response,@PathVariable("id") Long id) {
+        ProductionOrder po = poService.findOne(id);
+        po.assemble();
+        Map beans = new HashMap();
+        beans.put("po", po);
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd");
+        String date =sdf.format(new Date());
+        String fileName = "";
+        if(StringUtils.isBlank(fileName)){
+            fileName = "生产链接单_"+date+".xlsx";
+        }
+        String template ="productionOrder.xlsx";
+        String classpathResourceUrl = "classpath:/" + template;
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource(classpathResourceUrl);
+        XLSTransformer transformer=new XLSTransformer();
+
+        try {
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+            fileName = fileName.replaceAll("%2B","+");
+            fileName = fileName.replaceAll("%20"," ");
+            fileName = fileName.replaceAll("%2F","/");
+            fileName = fileName.replaceAll("%3F","?");
+            fileName = fileName.replaceAll("%25","%");
+            fileName = fileName.replaceAll("%23","#");
+            fileName = fileName.replaceAll("%26","&");
+            fileName = fileName.replaceAll("%3D","=");
+            fileName = fileName.replaceAll("%3B","；");
+            fileName = fileName.replaceAll("%28","(");
+            fileName = fileName.replaceAll("%29",")");
+            fileName = fileName.replaceAll("%2A","*");
+            fileName = fileName.replaceAll("%2D","-");
+            fileName = fileName.replaceAll("%2C",",");
+            fileName = fileName.replaceAll("%3A",":");
+            fileName = fileName.replaceAll("%5F","_");
+            fileName = fileName.replaceAll("%5C","\\");
+            fileName = fileName.replaceAll("%7E","~");
+            fileName = fileName.replaceAll("%5B","[");
+            fileName = fileName.replaceAll("%5D","]");
+            fileName = fileName.replaceAll("%7C","|");
+            Workbook wb = null;
+
+            wb=transformer.transformXLS(resource.getInputStream(), beans);
+            response.setContentType("APPLICATION/OCTET-STREAM");
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+            ServletOutputStream out=response.getOutputStream();
+            wb.write(out);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     @RequestMapping(method = RequestMethod.GET)
     @PageAttribute(sort = "id=desc")
     public String list(@CurrentUser User user,Searchable searchable, Model model) {
-
-        String name = user.getUsername();
-        if(name.equals("user4")|| name.equals("user5") || name.equals("user6")||name.equals("user7")){
-            searchable.addSearchParam("status_gt", 0);
-        }else if(name.equals("user8")){
-            searchable.addSearchParam("status_gt", 2);
-        }else if(name.endsWith("user1")){
+        List<String> jobList = new ArrayList<>();
+        List<UserOrganizationJob> jobs = user.getOrganizationJobs();
+        for(UserOrganizationJob job:jobs){
+            Job j= jobService.findOne(job.getJobId());
+            jobList.add(j.getName());
+        }
+        if(jobList.contains("订单负责人")|| jobList.contains("片区经理") || jobList.contains("销售总监")||jobList.contains("销售总监助理")){
+            searchable.addSearchParam("status_gt", ProductionOrder.STATUS_NEW);
+        }else if(jobList.contains("计划部经理")){
+            searchable.addSearchParam("status_gt", ProductionOrder.STATUS_REJECT);
+        }else if(jobList.contains("责任助理")){
 
         }else{
-            searchable.addSearchParam("status_eq", 4);
+            searchable.addSearchParam("status_eq", ProductionOrder.STATUS_CONFIRM);
         }
 
         model.addAttribute("page", poService.findAll(searchable));
+        model.addAttribute("type", "all");
         return viewName("list");
     }
 
     @RequestMapping(value="/tasks" ,method = RequestMethod.GET)
     @PageAttribute(sort = "id=desc")
     public String tasks(@CurrentUser User user,Searchable searchable, Model model) {
-        List<String> orderIds = poService.userTaskList(user.getUsername());
+        List<String> orderIds = poService.userTaskList(String.valueOf(user.getId()));
         if(orderIds.size() ==0){
             searchable.addSearchParam("orderId_in", new String[]{"-1"});
         }else {
             searchable.addSearchParam("orderId_in", orderIds);
         }
         model.addAttribute("page", poService.findAll(searchable));
-        return viewName("tasks");
+        model.addAttribute("type", "tasks");
+        return viewName("list");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -76,14 +153,29 @@ public class ProductionOrderController extends BaseController<ProductionOrder, L
         ProductionOrder po=poService.load(id);
         model.addAttribute("po", po);
         model.addAttribute(Constants.OP_NAME, "查看");
+        String json = poService.findAllDicts();
+        model.addAttribute("dicts",json);
         return viewName("editForm");
     }
     
     @RequestMapping(value = "{id}/update", method = RequestMethod.GET)
-    public String showUpdateForm(@PathVariable("id") Long id, Model model) {
-
+    public String showUpdateForm(@CurrentUser User user,@PathVariable("id") Long id, Model model) {
+        ProductionOrder po = poService.load(id);
+        List<String> jobList = new ArrayList<>();
+        List<UserOrganizationJob> jobs = user.getOrganizationJobs();
+        for(UserOrganizationJob job:jobs){
+            Job j= jobService.findOne(job.getJobId());
+            jobList.add(j.getName());
+        }
+        if(jobList.contains("责任助理")){
+            if(po.getStatus() != ProductionOrder.STATUS_NEW && po.getStatus() != ProductionOrder.STATUS_REJECT){
+                model.addAttribute("canEdit", "false");
+            }
+        }
         model.addAttribute(Constants.OP_NAME, "修改");
         model.addAttribute("po",poService.load(id));
+        String json = poService.findAllDicts();
+        model.addAttribute("dicts",json);
         return viewName("editForm");
     }
     
@@ -94,6 +186,8 @@ public class ProductionOrderController extends BaseController<ProductionOrder, L
         if (!model.containsAttribute("po")) {
             model.addAttribute("po", newModel());
         }
+        String json = poService.findAllDicts();
+        model.addAttribute("dicts",json);
         return viewName("editForm");
     }
 
@@ -109,7 +203,7 @@ public class ProductionOrderController extends BaseController<ProductionOrder, L
         }
         poService.add(po,jsonData);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "新增成功");
-        return redirectToUrl(null);
+        return redirectToUrl("/productionOrder/tasks");
     }
 
     @RequestMapping(value = "{id}/update", method = RequestMethod.POST)
@@ -188,4 +282,5 @@ public class ProductionOrderController extends BaseController<ProductionOrder, L
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "确认成功");
         return redirectToUrl(backURL);
     }
+
 }

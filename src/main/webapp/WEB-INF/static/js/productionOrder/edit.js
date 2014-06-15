@@ -2,11 +2,35 @@
  * Created by baraka on 14-4-6.
  */
 $(function(){
-	
+    var dictsJson = $("#dicts").val();
+    if(dictsJson !=null && dictsJson!=""){
+    var dicts = JSON.parse(dictsJson);
+    var nameDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "name";}),"name");
+    var brandDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "brand";}),"name");
+    var sizeStandardsMaleDicts= _.pluck(_.filter(dicts, function(dict) {return dict.type === "sizeStandardsMale";}),"name");
+    var sizeStandardsFemaleDicts= _.pluck(_.filter(dicts, function(dict) {return dict.type === "sizeStandardsFemale";}),"name");
+    var styleDicts= _.pluck(_.filter(dicts, function(dict) {return dict.type === "style";}),"name");
+    var handleMethodDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "handleMethod";}),"name");
+    var sampleStyleDicts= _.pluck(_.filter(dicts, function(dict) {return dict.type === "sampleStyle";}),"name");
+    var sampleProviderDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "sampleProvider";}),"name");
+    var materialReserveDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "materialReserve";}),"name");
+    var outshellStyleDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "outshellStyle";}),"name");
+    var outshellMaterialDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "outshellMaterial";}),"name");
+    var outshellHandleDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "outshellHandle";}),"name");
+    var liningStyleDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "liningStyle";}),"name");
+    var liningMaterialDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "liningMaterial";}),"name");
+    var liningHandleDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "liningHandle";}),"name");
+    var packagingReqDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "packagingReq";}),"name");
+    var packingReqDicts= _.pluck(_.filter(dicts, function(dict) {return dict.type === "packingReq";}),"name");
+    var sizebeltReqDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "sizebeltReq";}),"name");
+    var companylogoReqDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "companylogoReq";}),"name");
+    var productionPartsDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "productionParts";}),"name");
+    var checkReportDicts = _.pluck(_.filter(dicts, function(dict) {return dict.type === "checkReport";}),"name");
+    }
     var colorModel = {
                 colorName:"",
                 style:"",
-                materia:"",
+                material:"",
                 handle:""
     };
 
@@ -80,24 +104,28 @@ $(function(){
                 }
         vm.addOutshell = function(el){
             el.outshellSetColorJson.push(_.clone(colorModel));
+            vm.render();
         };
         vm.removeOutshell = function(el,data){
             el.outshellSetColorJson.remove(data);
         };
         vm.addLining = function(el){
             el.liningSetColorJson.push(_.clone(colorModel));
+            vm.render();
         };
-        vm.removelining = function(el,data){
+        vm.removeLining = function(el,data){
             el.liningSetColorJson.remove(data);
         };
         vm.addBagging = function(el){
             el.baggingJson.push(_.clone(colorModel));
+            vm.render();
         };
         vm.removeBagging = function(el,data){
             el.baggingJson.remove(data);
         };
 
         vm.click = function(){
+            //组织品名数据
             vm.outshellMainColor = JSON.stringify(vm.outshellMainColor);
             vm.liningMainColor = JSON.stringify(vm.liningMainColor);
             vm.outshellSetColorJson = JSON.stringify(vm.outshellSetColorJson);
@@ -105,6 +133,405 @@ $(function(){
             vm.baggingJson = JSON.stringify(vm.baggingJson);
             var jsonData= JSON.stringify(vm.$model.list);
             $("#jsonData").val(jsonData);
+            //组织标示图片数据
+            $(".tradeMark").each(function(index){
+                var obj = $(this);
+                var name = obj.attr("data-name");
+                var src = obj.attr("data-src");
+                var srcInput = $("<input>").attr("name","uploads["+index+"].src").attr("value",src);
+                var nameInput = $("<input>").attr("name","uploads["+index+"].name").attr("value",name);
+                $(".ajax-upload-input").append(srcInput).append(nameInput);
+            });
+
+
+        };
+        vm.render= function(action){
+
+        if(dictsJson !=null && dictsJson!=""){
+            $('.name').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: nameDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.brand').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: brandDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.styleNumberMale').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.sizeStandardsMale').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: sizeStandardsMaleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.styleNumberFemale').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.sizeStandardsFemale').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: sizeStandardsFemaleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+            $('.style').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: styleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+            $('.handleMethod').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: handleMethodDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+            $('.sampleStyle').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: sampleStyleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.sampleStyleNumber').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.sampleAmount').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.sampleRevisionDesc').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.sampleProvider').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: sampleProviderDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.materialReserve').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: materialReserveDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.measureSampleVersion').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.measureStaff').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.archiveStaff').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.x-date').editable({
+                inputclass: 'input-medium',
+                format: 'yyyy-mm-dd',
+                viewformat: 'yyyy-mm-dd',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    if(newValue == null || newValue == "" || newValue=="null"){
+                        input.val("");
+                    }else{
+                        var val  = moment(newValue).format('YYYY-MM-DD');
+                        input.val(val);
+                    }
+                }
+            });
+            $('.outshellColorName').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.outshellStyle').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: outshellStyleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.outshellMaterial').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: outshellMaterialDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.outshellHandle').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: outshellHandleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.liningColorName').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.liningStyle').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: liningStyleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.liningMaterial').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: liningMaterialDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.liningHandle').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: liningHandleDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.text').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            $('.packagingReq').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: packagingReqDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+            $('.packingReq').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: packingReqDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+            $('.sizebeltReq').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: sizebeltReqDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+            $('.companylogoReq').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: companylogoReqDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.productionParts').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: productionPartsDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+
+
+            $('.checkReport').editable({
+                inputclass: 'input-medium',
+                select2: {
+                            tags: checkReportDicts,
+                            tokenSeparators: [",", " "]
+                },
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                }
+            });
+            var op = $("#op").val();
+            var canEdit= $("#canEdit").val();
+            if(op=="查看" || canEdit == "false"){
+                $(".btn-primary").remove();
+                $(".fileinput-button").remove();
+                $(".imgDel").remove();
+                $('.editable').editable('option', 'disabled', true);
+            }
+            }
         };
 
 
@@ -127,8 +554,7 @@ $(function(){
     	
     	productionVM.list = jsonData;
     }
-    
 
-
+    //$.fn.editable.defaults.mode = 'inline';
 });
 

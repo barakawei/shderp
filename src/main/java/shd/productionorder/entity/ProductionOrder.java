@@ -7,16 +7,9 @@ package shd.productionorder.entity;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
+import com.alibaba.fastjson.JSON;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
@@ -25,6 +18,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import ee.common.entity.BaseEntity;
 import ee.common.repository.annotation.EnableQueryCache;
+import shd.common.entity.Upload;
+import shd.organizeprogress.entity.OrganizeProgress;
+import shd.productprogress.entity.ProductProgress;
 
 @Entity
 @Table(name = "production_order")
@@ -138,8 +134,14 @@ public class ProductionOrder extends BaseEntity<Long>{
 	private String factoryDirector;
 	
 	//标识要求
-	@Column(name = "label")
-	private String label;
+    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, targetEntity = Upload.class, mappedBy = "po", orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @Basic(optional = true, fetch = FetchType.EAGER)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+    //集合缓存引起的
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)//集合缓存
+    @OrderBy()
+	private List<Upload> uploads;
 		
 	//创建时间
 	@Column(name = "create_date")
@@ -148,14 +150,22 @@ public class ProductionOrder extends BaseEntity<Long>{
     //流程ID
     private String orderId;
 	
-	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, targetEntity = Production.class, mappedBy = "po", orphanRemoval = true)
+	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, targetEntity = Production.class, mappedBy = "po", orphanRemoval = true)
     @Fetch(FetchMode.SUBSELECT)
-    @Basic(optional = true, fetch = FetchType.LAZY)
+    @Basic(optional = true, fetch = FetchType.EAGER)
     @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
     //集合缓存引起的
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)//集合缓存
     @OrderBy()
 	private List<Production> productions;
+
+    @OneToOne(cascade = {CascadeType.ALL},fetch=FetchType.LAZY, orphanRemoval = true)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+    private OrganizeProgress op;
+
+    @OneToOne(cascade = {CascadeType.ALL},fetch=FetchType.LAZY, orphanRemoval = true)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+    private ProductProgress pp;
 
 	public String getCustomerName() {
 		return customerName;
@@ -408,23 +418,9 @@ public class ProductionOrder extends BaseEntity<Long>{
 	}
 
 
-
-	public String getLabel() {
-		return label;
-	}
-
-
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-
-
 	public Date getCreateDate() {
 		return createDate;
 	}
-
 
 
 	public void setCreateDate(Date createDate) {
@@ -471,4 +467,45 @@ public class ProductionOrder extends BaseEntity<Long>{
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
+
+    public OrganizeProgress getOp() {
+        return op;
+    }
+
+    public void setOp(OrganizeProgress op) {
+        this.op = op;
+    }
+
+    public ProductProgress getPp() {
+        return pp;
+    }
+
+    public void setPp(ProductProgress pp) {
+        this.pp = pp;
+    }
+
+    public List<Upload> getUploads() {
+        return uploads;
+    }
+
+    public void setUploads(List<Upload> uploads) {
+        this.uploads = uploads;
+    }
+
+    public void assemble(){
+        for(Production p :this.getProductions()) {
+            ColorSet main = JSON.parseObject(p.getOutshellMainColor(),ColorSet.class);
+            p.setMain(main);
+            ColorSet lining = JSON.parseObject(p.getLiningMainColor(),ColorSet.class);
+            p.setLining(lining);
+            List<ColorSet> outShell = JSON.parseArray(p.getOutshellSetColorJson(),ColorSet.class);
+            p.setOutShell(outShell);
+            List<ColorSet> liningSet = JSON.parseArray(p.getLiningSetColorJson(),ColorSet.class);
+            p.setLiningSet(liningSet);
+            List<ColorSet> bagging = JSON.parseArray(p.getBaggingJson(),ColorSet.class);
+            p.setBagging(bagging);
+        }
+    }
+
+
 }

@@ -40,23 +40,20 @@ public final class Condition implements SearchFilter {
     static Condition newCondition(final String key, final Object value) throws SearchException {
 
         Assert.notNull(key, "Condition key must not null");
-
-        String[] searchs = StringUtils.split(key, separator);
-
-        if (searchs.length == 0) {
+        int index = StringUtils.lastIndexOf(key, separator);
+        if (index== -1) {
             throw new SearchException("Condition key format must be : property or property_op");
         }
-
-        String searchProperty = searchs[0];
-
+        String searchProperty = StringUtils.substring(key,0,index);
+        String searchOperator = StringUtils.substring(key,index+1,key.length());
         SearchOperator operator = null;
-        if (searchs.length == 1) {
+        if (index == -1) {
             operator = SearchOperator.custom;
         } else {
             try {
-                operator = SearchOperator.valueOf(searchs[1]);
+                operator = SearchOperator.valueOf(searchOperator);
             } catch (IllegalArgumentException e) {
-                throw new InvlidSearchOperatorException(searchProperty, searchs[1]);
+                throw new InvlidSearchOperatorException(searchProperty, searchOperator);
             }
         }
 

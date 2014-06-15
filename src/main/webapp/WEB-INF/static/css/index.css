@@ -1,0 +1,23 @@
+.tradeMark{
+    position:relative;
+    float:left;
+    margin-left:20px;
+}
+.imgDel{
+    cursor:pointer;
+    position:absolute;
+    top:-13px;
+    right:-15px;
+    font-size:20px;
+}
+
+#purchase.table td{
+    line-height:10px;
+}
+
+#editForm.form-horizontal .control-group {
+    margin-bottom:0px;
+}
+body{
+    font-family:"微软雅黑,宋体"
+}

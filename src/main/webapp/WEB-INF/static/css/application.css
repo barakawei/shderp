@@ -1106,6 +1106,11 @@ a,input,textarea{blr:expression(this.onFocus=this.blur());} /* 只支持IE，过
 a:focus { -moz-outline-style: none; } /* IE不支持 */
 *:focus { outline: none; }
 
+[ms-controller],[ms-important],.ms-controller,.ms-important{
+     display:none;
+ }
+
+
 
 
 

@@ -8,4 +8,6 @@
 *.class
 *.tmp
 *.jar
-
+src/main/webapp/upload/
+src/main/webapp/WEB-INF/classes/
+src/main/webapp/WEB-INF/lib/

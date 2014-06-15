@@ -10,15 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ee.common.repository.BaseRepository;
 import ee.common.repository.RepositoryHelper;
-import ee.common.repository.support.SimpleBaseRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -63,8 +61,13 @@ public class UserService extends BaseService<User, Long> {
     }
 
     public List<User> findByJob(String[] jobs){
+        String jobString = "";
+        for(int i=0;i<jobs.length;i++){
+            jobs[i] = "'"+jobs[i]+"'";
+        }
+        jobString = StringUtils.join(jobs,",");
         RepositoryHelper rh = getUserRepository().getRepositoryHelper();
-        String sql ="select u.* from sys_user u left join sys_user_organization_job uoj on(u.id = uoj.user_id) left join sys_job job on(job.id = uoj.job_id) where job.name in ('销售总监','销售总监助理')";
+        String sql ="select u.* from sys_user u left join sys_user_organization_job uoj on(u.id = uoj.user_id) left join sys_job job on(job.id = uoj.job_id) where job.name in ("+jobString+")";
         Query query = rh.getEntityManager().createNativeQuery(sql,User.class);
         //query.setParameter("names",jobs);
         List<User> users = query.getResultList();
@@ -77,7 +80,7 @@ public class UserService extends BaseService<User, Long> {
             user.setCreateDate(new Date());
         }
         user.randomSalt();
-        user.setPassword(passwordService.encryptPassword(user.getUsername(), user.getPassword(), user.getSalt()));
+        user.setPassword(passwordService.encryptPassword(String.valueOf(user.getId()), user.getPassword(), user.getSalt()));
 
         return super.save(user);
     }
@@ -136,7 +139,7 @@ public class UserService extends BaseService<User, Long> {
 
     public User changePassword(User user, String newPassword) {
         user.randomSalt();
-        user.setPassword(passwordService.encryptPassword(user.getUsername(), newPassword, user.getSalt()));
+        user.setPassword(passwordService.encryptPassword(String.valueOf(user.getId()), newPassword, user.getSalt()));
         update(user);
         return user;
     }

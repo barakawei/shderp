@@ -35,16 +35,16 @@ public class JCaptchaFilter extends OncePerRequestFilter {
         response.setContentType("image/jpeg");
 
         String id = request.getRequestedSessionId();
-        BufferedImage bi = JCaptcha.captchaService.getImageChallengeForID(id);
-
-        ServletOutputStream out = response.getOutputStream();
-
-        ImageIO.write(bi, "jpg", out);
-        try {
-            out.flush();
-        } finally {
-            out.close();
-        }
+//        BufferedImage bi = JCaptcha.captchaService.getImageChallengeForID(id);
+//
+//        ServletOutputStream out = response.getOutputStream();
+//
+//        ImageIO.write(bi, "jpg", out);
+//        try {
+//            out.flush();
+//        } finally {
+//            out.close();
+//        }
     }
 
 

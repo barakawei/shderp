@@ -7,6 +7,7 @@ package ee.showcase.upload.web.controller;
 
 import javax.validation.Valid;
 
+import ee.showcase.upload.entity.UploadFile;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ee.common.utils.Constants;
-import ee.showcase.upload.entity.Upload;
 import ee.showcase.upload.service.UploadService;
 
 /**
@@ -37,14 +37,14 @@ public class AjaxUploadFormController {
     public String showCreateForm(Model model) {
         model.addAttribute(Constants.OP_NAME, "新增");
         if (!model.containsAttribute("upload")) {
-            model.addAttribute("upload", new Upload());
+            model.addAttribute("upload", new UploadFile());
         }
         return "showcase/upload/ajax/editForm";
     }
 
     @RequiresPermissions("showcase:upload:create")
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public String create(@Valid Upload upload, RedirectAttributes redirectAttributes) {
+    public String create(@Valid UploadFile upload, RedirectAttributes redirectAttributes) {
 
         uploadService.save(upload);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "创建文件成功");

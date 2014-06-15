@@ -5,13 +5,9 @@
 package shd.productionorder.entity;
 
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
@@ -27,7 +23,7 @@ import ee.common.repository.annotation.EnableQueryCache;
 public class Production extends BaseEntity<Long>{
 
 	private static final long serialVersionUID = 1L;
-	
+
 	//品名
 	@Column(name = "name")
 	private String name;
@@ -103,23 +99,39 @@ public class Production extends BaseEntity<Long>{
 	//面料主色
 	@Column(name ="outshell_main_color")
 	private String outshellMainColor;
+
+    @Transient
+    private ColorSet main;
 	
 	//里料主色
 	@Column(name ="lining_main_color")
 	private String liningMainColor;
+
+    @Transient
+    private ColorSet lining;
 	
 	//面料镶色
 	@Column(name ="outshell_set_color")
 	private String outshellSetColorJson;
-	
-	//里料镶色
+
+    @Transient
+    private List<ColorSet> outShell;
+
+
+    //里料镶色
 	@Column(name ="lining_set_color")
 	private String liningSetColorJson;
-	
+
+    @Transient
+    private List<ColorSet> liningSet;
+
 	//袋布
 	@Column(name ="bagging")
 	private String baggingJson;
-	
+
+    @Transient
+    private List<ColorSet> bagging;
+
 	//面辅料特殊要求
 	@Column(name ="material_special_req")
 	private String materialSpecialReq;
@@ -451,6 +463,13 @@ public class Production extends BaseEntity<Long>{
 	}
 
 	public Integer getNeedMale() {
+        if(amountMale == null){
+            amountMale = 0;
+        }
+        if(availableMale == null){
+            availableMale = 0;
+        }
+        needMale = this.amountMale-this.availableMale;
 		return needMale;
 	}
 
@@ -459,6 +478,13 @@ public class Production extends BaseEntity<Long>{
 	}
 
 	public Integer getNeedFemale() {
+        if(amountFemale == null){
+            amountFemale = 0;
+        }
+        if(availableFemale == null){
+            availableFemale = 0;
+        }
+        needFemale = this.amountFemale-this.availableFemale;
 		return needFemale;
 	}
 
@@ -475,6 +501,7 @@ public class Production extends BaseEntity<Long>{
 	}
 
 	public Integer getProductionTotal() {
+        productionTotal = this.getNeedMale()+this.getNeedFemale();
 		return productionTotal;
 	}
 
@@ -497,6 +524,44 @@ public class Production extends BaseEntity<Long>{
 	public void setPo(ProductionOrder po) {
 		this.po = po;
 	}
-	
-	
+
+    public ColorSet getMain() {
+        return main;
+    }
+
+    public void setMain(ColorSet main) {
+        this.main = main;
+    }
+
+    public ColorSet getLining() {
+        return lining;
+    }
+
+    public void setLining(ColorSet lining) {
+        this.lining = lining;
+    }
+
+    public List<ColorSet> getOutShell() {
+        return outShell;
+    }
+
+    public void setOutShell(List<ColorSet> outShell) {
+        this.outShell = outShell;
+    }
+
+    public List<ColorSet> getLiningSet() {
+        return liningSet;
+    }
+
+    public void setLiningSet(List<ColorSet> liningSet) {
+        this.liningSet = liningSet;
+    }
+
+    public List<ColorSet> getBagging() {
+        return bagging;
+    }
+
+    public void setBagging(List<ColorSet> bagging) {
+        this.bagging = bagging;
+    }
 }

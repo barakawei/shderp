@@ -1804,6 +1804,7 @@ $.table = {
         $.table.initDeleteSelected(table);
         $.table.initUpdateSelected(table);
         $.table.initSubmitSelected(table);
+        $.table.initExportSelected(table);
         $.table.initAuditSelected(table);
         $.table.initRejectSelected(table);
         $.table.initConfirmSelected(table);
@@ -2233,6 +2234,25 @@ $.table = {
         });
     },
     //add by qxw
+    initExportSelected : function($table, urlPrefix) {
+        if(!$table || !$table.length) {
+            return;
+        }
+        var $btn = $table.closest("[data-table='" + $table.attr("id") + "']").find(".btn-export:not(.btn-custom)");
+        urlPrefix = $.table.formatUrlPrefix(urlPrefix, $table);
+        $btn.off("click").on("click", function() {
+            var checkbox = $.table.getFirstSelectedCheckbox($table);
+            if(!checkbox.length)  return;
+            if(checkbox.length > 1){
+                $.app.alert({
+                    message : "请选择一条数据导出！"
+                });
+            }
+            var id = checkbox.val();
+            window.location.href = urlPrefix + "/" + id + "/export";
+        });
+    },
+
     initSubmitSelected : function($table, urlPrefix) {
         if(!$table || !$table.length) {
             return;

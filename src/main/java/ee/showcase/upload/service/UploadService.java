@@ -6,9 +6,7 @@
 package ee.showcase.upload.service;
 
 import ee.common.service.BaseService;
-import ee.showcase.upload.entity.Upload;
-import ee.showcase.upload.repository.UploadRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import ee.showcase.upload.entity.UploadFile;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +15,6 @@ import org.springframework.stereotype.Service;
  * <p>Version: 1.0
  */
 @Service
-public class UploadService extends BaseService<Upload, Long> {
+public class UploadService extends BaseService<UploadFile, Long> {
 
 }

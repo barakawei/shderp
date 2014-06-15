@@ -71,8 +71,8 @@ public class CustomFormAuthenticationFilter extends FormAuthenticationFilter {
      */
     @Override
     public String getSuccessUrl() {
-        String username = (String) SecurityUtils.getSubject().getPrincipal();
-        User user = userService.findByUsername(username);
+        String userId = (String) SecurityUtils.getSubject().getPrincipal();
+        User user = userService.findOne(Long.getLong(userId));
         if (user != null && Boolean.TRUE.equals(user.getAdmin())) {
             return getAdminDefaultSuccessUrl();
         }
