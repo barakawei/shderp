@@ -21,22 +21,17 @@ $(function(){
                 }
             });
 
-
-             $('.organizeProgress .editable').off('hidden');
-             $('.organizeProgress .editable').on('hidden', function(e, reason){
-                        if(reason === 'save' || reason === 'nochange') {
-                            var $next = $(this).closest('td').next().find('.editable');
-                                setTimeout(function() {
-                                    $next.editable('show');
-                                }, 300);
-                        }
-             });
                 var permission = $("#permission").val();
                  $('.editable').editable('option', 'disabled', true);
                  if(permission!=""){
                     $('.'+permission+'.editable').editable('option', 'disabled', false);
                  }
-
+//点中高亮
+                $(".table tr").click(function(){
+                    //移除上一个高亮
+                    $(".active").removeClass("active");
+                    $(this).addClass("active");
+                });
 
 });
 

@@ -132,7 +132,14 @@ public class ProductionOrder extends BaseEntity<Long>{
 	//生产厂长
 	@Column(name = "factory_director")
 	private String factoryDirector;
-	
+
+    //变更信息
+    @Column(name ="change_info")
+    private String changeInfoJson;
+
+    @Transient
+    private List<ChangeInfo> changeInfo;
+
 	//标识要求
     @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, targetEntity = Upload.class, mappedBy = "po", orphanRemoval = true)
     @Fetch(FetchMode.SUBSELECT)
@@ -505,7 +512,23 @@ public class ProductionOrder extends BaseEntity<Long>{
             List<ColorSet> bagging = JSON.parseArray(p.getBaggingJson(),ColorSet.class);
             p.setBagging(bagging);
         }
+        List<ChangeInfo> changeInfos = JSON.parseArray(this.getChangeInfoJson(),ChangeInfo.class);
+        this.setChangeInfo(changeInfos);
     }
 
+    public String getChangeInfoJson() {
+        return changeInfoJson;
+    }
 
+    public void setChangeInfoJson(String changeInfoJson) {
+        this.changeInfoJson = changeInfoJson;
+    }
+
+    public List<ChangeInfo> getChangeInfo() {
+        return changeInfo;
+    }
+
+    public void setChangeInfo(List<ChangeInfo> changeInfo) {
+        this.changeInfo = changeInfo;
+    }
 }

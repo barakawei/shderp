@@ -1,14 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/WEB-INF/jsp/common/taglibs.jspf"%>
 <es:contentHeader/>
-<script src="${ctx}/static/js/purchaseOrder/edit.js?44" type="text/javascript"></script>
-<script src="${ctx}/static/js/frozen-table.js?23" type="text/javascript"></script>
+<script src="${ctx}/static/js/purchaseOrder/edit.js?52" type="text/javascript"></script>
 
 
 <div>
 	<input type="hidden" id="op" value="${op}">
 	<input type="hidden" id="permission" value="${permission}">
     <input type="hidden" id ="modelJson"  value='${po.modelJson}'>
+    <input type="hidden" id ="type"  value='${type}'>
 </div>
 
 
@@ -27,11 +27,13 @@
 
         <c:if test="${not empty po.id}">
         <li ${op eq '查看' ? 'class="active"' : ''}>
-            <a href="${ctx}/purchaseOrder/${po.id}?BackURL=<es:BackURL/>">
+            <a href="${ctx}/purchaseOrder/${po.id}/all?BackURL=<es:BackURL/>">
                 <i class="icon-eye-open"></i>
                 查看
             </a>
         </li>
+        <c:if test="${method!='summary'}">
+        <c:if test="${type == 'all'}">
         <shiro:hasPermission name="purchaseOrder:update">
         <li ${op eq '修改' ? 'class="active"' : ''}>
             <a href="${ctx}/purchaseOrder/${po.id}/update?BackURL=<es:BackURL/>">
@@ -40,6 +42,8 @@
             </a>
         </li>
         </shiro:hasPermission>
+        </c:if>
+        </c:if>
         </c:if>
         <li>
             <a href="<es:BackURL/>" class="btn btn-link">
@@ -136,9 +140,9 @@
                         </shiro:hasPermission>
             </h4>
 
-        <div id="detail"  style="width:1200px;overflow-x:scroll;overflow-y:hidden">
-        <div class="ScrollTableContainer" style="width:2850px;">
-                <table class="table table-bordered table-condensed" style="width:2850px;">
+        <div id="detail"  style="width:100%;overflow-x:scroll;overflow-y:hidden">
+        <div class="ScrollTableContainer" style="width:${width}px;">
+                <table class="table table-bordered table-condensed" style="width:${width}px;">
                 <thead>
                     <tr class="table-head">
                                 <th style="width:20px;">#</th>
@@ -150,39 +154,67 @@
                                 <th style="width:48px;">类别</th>
                                 <th style="width:150px;">型号规格</th>
                                 <th style="width:65px;">面辅料成分</th>
+                                <c:if test ="${type=='all'||type=='plan'}">
                                 <th style="width:75px;">计划净宽/CM</th>
+                                </c:if>
                                 <th style="width:48px;">单量</th>
+                                <c:if test ="${type!='summary'}">
                                 <th style="width:48px;">颜色</th>
+                                </c:if>
+                                <c:if test ="${type=='all'||type=='plan'}">
                                 <th style="width:60px;">预排单耗</th>
+                                </c:if>
                                 <th style="width:30px;">单位</th>
+                                <c:if test ="${type=='all'||type=='plan'}">
                                 <th style="width:70px;">预留损耗1*%</th>
                                 <th style="width:180px;">面辅料特殊要求</th>
                                 <th style="width:60px;">预排规格</th>
                                 <th style="width:60px;">采购计划</th>
                                 <th style="width:60px;">库存数量</th>
+                                </c:if>
+                                <c:if test ="${type!='notify'}">
                                 <th style="width:60px;">实需采购</th>
+                                </c:if>
+                                <c:if test ="${type=='all'||type=='summary'}">
                                 <th style="width:48px;">单价</th>
                                 <th style="width:60px;">入库数量</th>
                                 <th style="width:90px;">计划外入库(元)</th>
+                                </c:if>
+                                <c:if test ="${type=='all'}">
                                 <th style="width:60px;">缺料预警</th>
+                                </c:if>
+                                <c:if test ="${type=='all'||type=='notify'}">
                                 <th style="width:90px;">使用面辅料批号</th>
+                                </c:if>
+                                <c:if test ="${type=='all'}">
                                 <th style="width:105px;">实测缩率:经%/纬%</th>
+                                </c:if>
+                                <c:if test ="${type=='all'||type=='notify'}">
                                 <th style="width:60px;">实排规格</th>
                                 <th style="width:80px;">实排门幅(CM)</th>
                                 <th style="width:60px;">实排单耗</th>
                                 <th style="width:60px;">核定损耗</th>
+                                </c:if>
+                                <c:if test ="${type!='plan'}">
                                 <th style="width:60px;">核定用料</th>
+                                </c:if>
+                                <c:if test ="${type=='all'||type=='notify'}">
                                 <th style="width:60px;">实发用料</th>
+                                </c:if>
+                                <c:if test ="${type=='all'}">
                                 <th style="width:48px;">退回</th>
                                 <th style="width:60px;">实际使用</th>
+                                </c:if>
+                                <c:if test ="${type=='all'||type=='summary'}">
                                 <th style="width:65px;">超用料(元)</th>
                                 <th style="width:60px;">超用原因</th>
                                 <th style="width:80px;">订单结算(元)</th>
+                                </c:if>
                     </tr>
                     </thead>
                     </table>
-                    <div class="ScrollDiv" style="overflow-y: scroll; overflow-x:hidden;width:2850px; max-height: 400px;">
-                    <table id="purchase" class="table table-bordered table-condensed" style="width:2850px;" initialized="true">
+                    <div class="ScrollDiv" style="overflow-y: scroll; overflow-x:hidden;width:${width}px;">
+                    <table id="purchase" class="table table-bordered table-condensed" style="width:${width}px;" initialized="true">
                     <tbody ms-each-el="list" data-each-rendered="render">
 
                     <tr ms-if='el.category=="面里料类衣"'>
@@ -241,26 +273,37 @@
                             <a href="javascript:void(0)" class="plan">{{el.composition}}</a>
                             <input type="text" class="hide" ms-duplex="el.composition"/>
                         </td>
+                        <!-- 计划净宽-->
+                        <c:if test ="${type=='all'||type=='plan'}">
                         <td>
                             <a href="javascript:void(0)" class="plan">{{el.width}}</a>
                             <input type="text" class="hide" ms-duplex="el.width"/>
                         </td>
+                        </c:if>
                         <td>
                             <a href="javascript:void(0)" class="plan produce">{{el.amount}}</a>
                             <input type="text" class="hide" ms-duplex="el.amount"/>
                         </td>
+                        <!-- 颜色-->
+                        <c:if test ="${type!='summary'}">
                         <td>
                             <a href="javascript:void(0)" class="plan">{{el.color}}</a>
                             <input type="text" class="hide" ms-duplex="el.color"/>
                         </td>
+                        </c:if>
+                        <!--预排单耗-->
+                        <c:if test ="${type=='all'||type=='plan'}">
                         <td>
                             <a href="javascript:void(0)" class="plan tech">{{el.consume}}</a>
                             <input type="text" class="hide" ms-duplex="el.consume"/>
                         </td>
+                        </c:if>
                         <td>
                             <a href="javascript:void(0)" class="plan">{{el.unit}}</a>
                             <input type="text" class="hide" ms-duplex="el.unit"/>
                         </td>
+                        <!--预留损耗-->
+                        <c:if test ="${type=='all'||type=='plan'}">
                         <td>
                             <a href="javascript:void(0)" class="plan">{{el.loss}}</a>
                             <input type="text" class="hide" ms-duplex="el.loss"/>
@@ -285,19 +328,23 @@
                             <a href="javascript:void(0)" class="warehouse">{{el.warehouseAmount}}</a>
                             <input type="text" class="hide" ms-duplex="el.warehouseAmount"/>
                         </td>
+                        </c:if>
                         <!--实需采购-->
+
+                        <c:if test ="${type!='notify'}">
                         <td>
                             <a href="javascript:void(0)">
-                                {{(el.amount*el.consume*el.loss-el.warehouseAmount).toFixed(2)}}
+                                {{(el.amount*el.consume*el.loss-el.warehouseAmount-el.entryAmount)<=0?0:(el.amount*el.consume*el.loss-el.warehouseAmount-el.entryAmount).toFixed(2)}}
                             </a>
                         </td>
+                        </c:if>
                         <!--单价-->
+                        <c:if test ="${type=='all'||type=='summary'}">
                         <td>
                             <a href="javascript:void(0)" class="warehouse supply">{{el.price}}</a>
                             <input type="text" class="hide" ms-duplex="el.price"/>
                         </td>
                         <!--入库数量-->
-
 
                         <td>
                             <a href="javascript:void(0)" class="warehouse">{{el.entryAmount}}</a>
@@ -309,20 +356,31 @@
                             {{((el.entryAmount-(el.amount*el.consume*el.loss-el.warehouseAmount))*el.price <=0?0:(el.entryAmount-(el.amount*el.consume*el.loss-el.warehouseAmount))*el.price).toFixed(2)}}
                             </a>
                         </td>
+                        </c:if>
                         <!--缺料预警-->
+                        <c:if test ="${type=='all'}">
                         <td>
                             <a href="javascript:void(0)">
                          {{((el.amount*el.actualConsume*el.actualLoss-el.warehouseAmount-el.entryAmount)<=0?0:(el.amount*el.actualConsume*el.actualLoss-el.warehouseAmount-el.entryAmount)).toFixed(2)}}
                          </a>
                         </td>
+                        </c:if>
+                        <!--使用面辅料批号-->
+                        <c:if test ="${type=='all'||type=='notify'}">
                         <td>
                             <a href="javascript:void(0)" class="warehouse">{{el.materialNumber}}</a>
                             <input type="text" class="hide" ms-duplex="el.materialNumber"/>
                         </td>
+                        </c:if>
+                        <!--实测缩率-->
+                        <c:if test ="${type=='all'}">
                         <td>
                             <a href="javascript:void(0)" class="check" >{{el.shrinkage}}</a>
                             <input type="text" class="hide" ms-duplex="el.shrinkage"/>
                         </td>
+                        </c:if>
+                        <!-- 实排规格-->
+                        <c:if test ="${type=='all'||type=='notify'}">
                         <td>
                             <a href="javascript:void(0)" class="tech" >{{el.actualDischargeSpec}}</a>
                             <input type="text" class="hide" ms-duplex="el.actualDischargeSpec"/>
@@ -341,18 +399,24 @@
                             <a href="javascript:void(0)" class="plan">{{el.actualLoss}}</a>
                             <input type="text" class="hide" ms-duplex="el.actualLoss"/>
                         </td>
+                        </c:if>
                         <!--核定用料-->
+                         <c:if test ="${type!='plan'}">
                         <td>
                             <a href="javascript:void(0)">
                             {{(el.amount*el.actualConsume*el.actualLoss).toFixed(2)}}
                             </a>
                         </td>
+                        </c:if>
                         <!--实发用料-->
+                        <c:if test ="${type=='all'||type=='notify'}">
                         <td>
                             <a href="javascript:void(0)"  class="warehouse">{{el.sendUse}}</a>
                             <input type="text" class="hide" ms-duplex="el.sendUse"/>
                         </td>
+                        </c:if>
                         <!--退回-->
+                        <c:if test ="${type=='all'}">
                         <td>
                             <a href="javascript:void(0)"  class="warehouse">{{el.returnUse}}</a>
                             <input type="text" class="hide" ms-duplex="el.returnUse"/>
@@ -363,7 +427,9 @@
                             {{(el.sendUse-el.returnUse).toFixed(2)}}
                             </a>
                         </td>
+                        </c:if>
                         <!--超用料-->
+                        <c:if test ="${type=='all'||type=='summary'}">
                         <td>
                             <a href="javascript:void(0)">
                             {{((el.sendUse-el.returnUse-el.amount*el.actualConsume*el.actualLoss)*el.price<=0?0:(el.sendUse-el.returnUse-el.amount*el.actualConsume*el.actualLoss)*el.price).toFixed(2)}}
@@ -379,6 +445,7 @@
                             {{((el.sendUse-el.returnUse)*el.price).toFixed(2)}}
                             </a>
                         </td>
+                        </c:if>
                     </tr>
 
                     </tbody>

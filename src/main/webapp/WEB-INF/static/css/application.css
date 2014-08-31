@@ -122,7 +122,7 @@ input.search-query {
 }
 
 .input-small {
-    width: 65px;
+    width: 65px !important;
 }
 
 .input-medium {

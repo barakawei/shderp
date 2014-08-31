@@ -26,7 +26,7 @@ public class LogUtils {
      * @param request
      */
     public static void logAccess(HttpServletRequest request) {
-        String username = getUsername();
+        //String username = getUsername();
         String jsessionId = request.getRequestedSessionId();
         String ip = IpUtils.getIpAddr(request);
         String accept = request.getHeader("accept");
@@ -36,7 +36,7 @@ public class LogUtils {
         String headers = getHeaders(request);
 
         StringBuilder s = new StringBuilder();
-        s.append(getBlock(username));
+        //s.append(getBlock(username));
         s.append(getBlock(jsessionId));
         s.append(getBlock(ip));
         s.append(getBlock(accept));
@@ -56,10 +56,10 @@ public class LogUtils {
      * @param e
      */
     public static void logError(String message, Throwable e) {
-        String username = getUsername();
+        //String username = getUsername();
         StringBuilder s = new StringBuilder();
         s.append(getBlock("exception"));
-        s.append(getBlock(username));
+        //s.append(getBlock(username));
         s.append(getBlock(message));
         ERROR_LOG.error(s.toString(), e);
     }
@@ -71,7 +71,7 @@ public class LogUtils {
      * @param request
      */
     public static void logPageError(HttpServletRequest request) {
-        String username = getUsername();
+       // String username = getUsername();
 
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         String message = (String) request.getAttribute("javax.servlet.error.message");
@@ -85,7 +85,7 @@ public class LogUtils {
 
         StringBuilder s = new StringBuilder();
         s.append(getBlock(t == null ? "page" : "exception"));
-        s.append(getBlock(username));
+        //s.append(getBlock(username));
         s.append(getBlock(statusCode));
         s.append(getBlock(message));
         s.append(getBlock(IpUtils.getIpAddr(request)));

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import shd.common.util.UserContextUtil;
 import shd.productionorder.service.ProductionOrderService;
 import shd.productprogress.entity.ProductProgress;
 import shd.productprogress.service.ProductProgressService;
@@ -36,11 +37,18 @@ public class ProductProgressController extends BaseController<ProductProgress, L
     @Autowired
     private ProductionOrderService poService;
 
+    @Autowired
+    private UserContextUtil userContextUtil;
+
     @RequestMapping(method = RequestMethod.GET)
     @PageAttribute(sort = "id=desc")
-    public String list(@CurrentUser User user,Searchable searchable, Model model,String type) {
-        if("summary".equals(type)){
-            model.addAttribute("type",type);
+    public String list(@CurrentUser User user,Searchable searchable, Model model,String method) {
+        if("summary".equals(method)){
+            model.addAttribute("method",method);
+        }
+        boolean isAssistant = userContextUtil.hasJob(user,"责任助理");
+        if(isAssistant){
+            searchable.addSearchParam("po.assistant_eq",user.getUsername());
         }
         model.addAttribute("page", ppService.findAll(searchable));
         String permission = ppService.getEditPermission();

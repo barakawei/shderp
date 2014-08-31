@@ -76,7 +76,7 @@ import ee.common.web.bind.annotation.PageAttribute;
  */
 public class PageAttributeArgumentResolver extends BaseMethodArgumentResolver {
 
-    private static final Pageable DEFAULT_PAGE_REQUEST = new PageRequest(0, 10);
+    private static final Pageable DEFAULT_PAGE_REQUEST = new PageRequest(0, 200);
     private static final String DEFAULT_PAGE_PREFIX = "page";
     private static final String DEFAULT_SORT_PREFIX = "sort";
 
@@ -85,7 +85,7 @@ public class PageAttributeArgumentResolver extends BaseMethodArgumentResolver {
     private String sortPrefix = DEFAULT_SORT_PREFIX;
 
     private int minPageSize = 5;
-    private int maxPageSize = 100;
+    private int maxPageSize = 1000;
 
     /**
      * 设置最小分页大小 默认10

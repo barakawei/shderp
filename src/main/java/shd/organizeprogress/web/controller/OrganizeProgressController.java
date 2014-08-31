@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import shd.common.util.UserContextUtil;
 import shd.organizeprogress.entity.OrganizeProgress;
 import shd.organizeprogress.service.OrganizeProgressService;
 
@@ -31,12 +32,21 @@ public class OrganizeProgressController extends BaseController<OrganizeProgress,
     @Autowired
     private OrganizeProgressService opService;
 
+    @Autowired
+    private UserContextUtil userContextUtil;
+
     @RequestMapping(method = RequestMethod.GET)
     @PageAttribute(sort = "id=desc")
-    public String list(@CurrentUser User user,Searchable searchable, Model model,String type) {
-        if("summary".equals(type)){
-            model.addAttribute("type",type);
+    public String list(@CurrentUser User user,Searchable searchable, Model model,String method) {
+        if("summary".equals(method)){
+            model.addAttribute("method",method);
         }
+
+        boolean isAssistant = userContextUtil.hasJob(user,"责任助理");
+        if(isAssistant){
+            searchable.addSearchParam("po.assistant_eq",user.getUsername());
+        }
+
         model.addAttribute("page", opService.findAll(searchable));
         String permission = opService.getEditPermission();
         model.addAttribute("permission",permission);

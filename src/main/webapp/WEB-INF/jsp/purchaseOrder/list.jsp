@@ -2,7 +2,6 @@
 <%@include file="/WEB-INF/jsp/common/taglibs.jspf"%>
 <es:contentHeader/>
 
-
 <div data-table="table" class="panel">
 
     <ul class="nav nav-tabs">
@@ -21,6 +20,13 @@
     <div class="row-fluid tool ui-toolbar">
         <div class="span3">
             <div class="btn-group">
+
+                <shiro:hasPermission name="purchaseOrder:create">
+                             <a class="btn btn-copy">
+                                 <span class="icon-file-alt"></span>
+                                补单
+                             </a>
+                </shiro:hasPermission>
 
                 <shiro:hasPermission name="purchaseOrder:update">
                 <a id="update" class="btn btn-update">
@@ -49,6 +55,7 @@
             <%@include file="searchForm.jsp" %>
         </div>
     </div>
+    <div class="table-container">
     <table id="table" class="sort-table table table-bordered table-hover" data-prefix-url="${ctx}/purchaseOrder">
         <thead>
         <tr>
@@ -57,15 +64,11 @@
                 |
                 <a class="reverse-all" href="javascript:;">反选</a>
             </th>
-            <th sort="orderNumber">订单号</th>
-            <th sort="serialNumber">序列号</th>
-            <th sort="customerName">客户名称</th>
-            <th sort="contractDeliveryDate">合同交期</th>
-            <!--
-            <th sort="status">状态</th>
-            -->
-
+            <th style="width:160px;" sort="orderNumber">订单号</th>
+            <th style="width:160px;" sort="serialNumber">序列号</th>
+            <th  sort="customerName">客户名称</th>
         </tr>
+        </thead>
         <tbody>
         <c:forEach items="${page.content}" var="m">
             <tr>
@@ -75,25 +78,24 @@
                 </td>
 
                 <td>
-                    <a href="${ctx}/purchaseOrder/${m.id}">
+                    <a href="${ctx}/purchaseOrder/${m.id}/all">
                         ${m.orderNumber}
                     </a>
                 </td>
                 <td>${m.serialNumber}</td>
-                <td>${m.customerName}</td>
-                <td><fmt:formatDate value="${m.contractDeliveryDate}" pattern="yyyy-MM-dd"/></td>
+                <td >${m.customerName}</td>
 
 
             </tr>
         </c:forEach>
         </tbody>
     </table>
+    </div>
     <es:page page="${page}"/>
 </div>
 <es:contentFooter/>
 <script type="text/javascript">
     $(function() {
-
        $("#import").click(function(){
             var file = $("#file").val();
             if(file == null || file ==""){

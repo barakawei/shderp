@@ -295,7 +295,7 @@ public class PurchaseOrder extends BaseEntity<Long> {
                 break;
 
             }
-            if (null!=firstColumn && !firstColumn.contains("订单合同交期") && i >= 6) {
+            if (null!=firstColumn && !firstColumn.contains("订单合同交期") && i >= 5) {
                 if (rows.get(i).getName() != null &&
                         rows.get(i).getSex() == null &&
                         rows.get(i).getType() == null &&
@@ -319,7 +319,7 @@ public class PurchaseOrder extends BaseEntity<Long> {
                 p.setSortNo(i);
                 //下面两个数据为公式，参照预排单耗和预定损耗
                 //实排单耗
-                if(p.getActualConsume() == null){
+                if(p.getActualConsume() != null && "FORMULA".equals(p.getActualConsume())){
                     p.setActualConsume(p.getConsume());
                 }
                 //核定损耗

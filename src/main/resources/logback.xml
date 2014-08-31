@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <configuration debug="false">
-    <property name="log.dir" value="../log" />
+    <property name="log.dir" value="logs" />
 
     <!-- 控制台 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -67,14 +67,16 @@
         <!--<appender-ref ref="STDOUT"/>-->
     <!--</logger>-->
 
-    <!--错误日志-->
+    <!--错误日志
+    -->
     <logger name="es-error" level="info">
         <appender-ref ref="ERROR"/>
     </logger>
-    <!--访问日志-->
+    <!--访问日志
     <logger name="es-access" level="info">
         <appender-ref ref="ACCESS"/>
     </logger>
+    -->
     <!--系统用户操作日志-->
     <logger name="es-sys-user" level="info">
         <appender-ref ref="SYS-USER"/>
@@ -83,8 +85,7 @@
     <logger name="org.hibernate.tool.hbm2ddl" level="info">
         <appender-ref ref="SQL"/>
     </logger>
-
-    <!--
+    -->
 
     <logger name="ee.extra.aop" level="info">
         <appender-ref ref="STDOUT"/>
@@ -98,7 +99,6 @@
     <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE">
             <appender-ref ref="sql"/>
     </logger>
-    -->
 
 
 </configuration>

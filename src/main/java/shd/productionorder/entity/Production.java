@@ -66,7 +66,7 @@ public class Production extends BaseEntity<Long>{
 	
 	//样衣数量
 	@Column(name = "sample_amount")
-	private Integer sampleAmount;
+	private String sampleAmount;
 	
 	//样衣修改说明
 	@Column(name = "sample_revision_desc")
@@ -278,15 +278,15 @@ public class Production extends BaseEntity<Long>{
 		this.sampleStyleNumber = sampleStyleNumber;
 	}
 
-	public Integer getSampleAmount() {
-		return sampleAmount;
-	}
+    public String getSampleAmount() {
+        return sampleAmount;
+    }
 
-	public void setSampleAmount(Integer sampleAmount) {
-		this.sampleAmount = sampleAmount;
-	}
+    public void setSampleAmount(String sampleAmount) {
+        this.sampleAmount = sampleAmount;
+    }
 
-	public String getSampleRevisionDesc() {
+    public String getSampleRevisionDesc() {
 		return sampleRevisionDesc;
 	}
 

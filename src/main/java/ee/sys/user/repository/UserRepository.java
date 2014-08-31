@@ -22,7 +22,7 @@ import ee.sys.user.entity.UserOrganizationJob;
  */
 @SearchableQuery(callbackClass = UserSearchCallback.class)
 public interface UserRepository extends BaseRepository<User, Long> {
-
+    @Query("from User where username=?1 and deleted is false")
     User findByUsername(String username);
 
     User findByMobilePhoneNumber(String mobilePhoneNumber);

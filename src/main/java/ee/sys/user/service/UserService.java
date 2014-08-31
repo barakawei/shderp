@@ -34,6 +34,7 @@ import ee.sys.user.exception.UserNotExistsException;
 import ee.sys.user.exception.UserPasswordNotMatchException;
 import ee.sys.user.repository.UserRepository;
 import ee.sys.user.utils.UserLogUtils;
+import shd.purchaseorder.entity.PurchaseOrder;
 
 import javax.persistence.Query;
 
@@ -80,6 +81,7 @@ public class UserService extends BaseService<User, Long> {
             user.setCreateDate(new Date());
         }
         user.randomSalt();
+        super.save(user);
         user.setPassword(passwordService.encryptPassword(String.valueOf(user.getId()), user.getPassword(), user.getSalt()));
 
         return super.save(user);
@@ -304,5 +306,20 @@ public class UserService extends BaseService<User, Long> {
      */
     public void deleteUserOrganizationJobOnNotExistsUser() {
         getUserRepository().deleteUserOrganizationJobOnNotExistsUser();
+    }
+
+    public void delete(Long id){
+        User u = getUserRepository().findOne(id);
+        try {
+            getUserRepository().delete(u);
+        }catch (Exception e){
+
+        }
+    }
+
+    public void delete(Long[] ids){
+        for(Long id :ids){
+            this.delete(id);
+        }
     }
 }

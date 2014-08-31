@@ -1,6 +1,31 @@
 /**
  * Created by baraka on 14-4-6.
  */
+ // 对Date的扩展，将 Date 转化为指定格式的String
+ // 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+ // 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+ // 例子：
+ // (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
+ // (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
+ Date.prototype.Format = function(fmt){ //author: meizz
+   var o = {
+     "M+" : this.getMonth()+1,                 //月份
+     "d+" : this.getDate(),                    //日
+     "h+" : this.getHours(),                   //小时
+     "m+" : this.getMinutes(),                 //分
+     "s+" : this.getSeconds(),                 //秒
+     "q+" : Math.floor((this.getMonth()+3)/3), //季度
+     "S"  : this.getMilliseconds()             //毫秒
+   };
+   if(/(y+)/.test(fmt))
+     fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+   for(var k in o)
+     if(new RegExp("("+ k +")").test(fmt))
+   fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+   return fmt;
+ }
+
+
 $(function(){
     var dictsJson = $("#dicts").val();
     if(dictsJson !=null && dictsJson!=""){
@@ -93,9 +118,20 @@ $(function(){
 
     };
 
+    var changeInfoModel = {
+        content:"",
+        time:new Date().Format("yyyy-MM-dd")
+    };
 
     var productionVM = avalon.define("production", function (vm) {
         vm.list = [];
+        vm.changeInfo = [_.clone(changeInfoModel)];
+        vm.addChangeInfo = function(){
+            vm.changeInfo.push(_.clone(changeInfoModel,true));
+        };
+        vm.removeChangeInfo = function(el){
+            vm.changeInfo.remove(el);
+        };
         vm.add = function(){
             vm.list.push(_.clone(productionModel,true));
         };
@@ -133,6 +169,9 @@ $(function(){
             vm.baggingJson = JSON.stringify(vm.baggingJson);
             var jsonData= JSON.stringify(vm.$model.list);
             $("#jsonData").val(jsonData);
+            //组织变更信息
+            var changeInfoJson = JSON.stringify(vm.$model.changeInfo);
+             $("#changeInfoJson").val(changeInfoJson);
             //组织标示图片数据
             $(".tradeMark").each(function(index){
                 var obj = $(this);
@@ -145,6 +184,7 @@ $(function(){
 
 
         };
+
         vm.render= function(action){
 
         if(dictsJson !=null && dictsJson!=""){
@@ -444,6 +484,19 @@ $(function(){
                     input.val(newValue);
                 }
             });
+            $('.number').editable({
+                inputclass: 'input-medium',
+                success: function(response, newValue) {
+                    var self = $(this);
+                    var input = self.next().next();
+                    input.val(newValue);
+                },
+                validate:function(v){
+                     if(isNaN(v)){
+                        return '请输入数字!';
+                     }
+                }
+            });
             $('.packagingReq').editable({
                 inputclass: 'input-medium',
                 select2: {
@@ -530,6 +583,7 @@ $(function(){
                 $(".fileinput-button").remove();
                 $(".imgDel").remove();
                 $('.editable').editable('option', 'disabled', true);
+                $(".operator-btn").remove();
             }
             }
         };
@@ -553,6 +607,11 @@ $(function(){
     	});
     	
     	productionVM.list = jsonData;
+
+    	//变更信息
+    	var changeJsonStr = $("#changeInfoJson").val();
+        var changeInfoJson = JSON.parse(changeJsonStr);
+        productionVM.changeInfo = changeInfoJson;
     }
 
     //$.fn.editable.defaults.mode = 'inline';

@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/WEB-INF/jsp/common/taglibs.jspf"%>
 <es:contentHeader/>
-<script src="${ctx}/static/js/productProgress/edit.js?4" type="text/javascript"></script>
 
 <div>
 	<input type="hidden" id="permission" value="${permission}">
@@ -26,24 +25,38 @@
     <div class="row-fluid tool ui-toolbar">
         <div class="span3">
             <div class="btn-group">
+                      <c:if test="${method!='summary'}">
+                        <shiro:hasPermission name="productProgress:update">
+                             <button type="button" id="submit" class="btn no-disabled btn-primary">
+                                 <i class="icon-edit"></i>
+                                     修改
+                             </button>
+                      </shiro:hasPermission>
+                     </c:if>
 
+                    <c:if test="${method=='summary'}">
+                    <a href="<es:BackURL/>" class="btn no-disabled">
+                        <i class="icon-reply"></i>
+                        返回
+                    </a>
+                    </c:if>
             </div>
         </div>
         <div class="span9">
             <%@include file="searchForm.jsp" %>
         </div>
     </div>
-
 <form id="editForm" method="post"  action="productProgress/update" class="form-inline form-horizontal form-small">
-    <table id="table" style="width:1900px;" class="sort-table table table-bordered table-hover productProgress" data-prefix-url="${ctx}/productProgress">
+<div class="table-container">
+    <table id="table" style="width:2300px;" class="sort-table table table-bordered table-hover productProgress" data-prefix-url="${ctx}/productProgress">
         <thead>
         <tr>
             <th style="width:50px;" sort="status">状态</th>
-            <th style="width:50px;" sort="po.orderNumber">订单号</th>
-            <th style="width:50px;" sort="po.serialNumber">序列号</th>
+            <th style="width:100px;" sort="po.orderNumber">订单号</th>
+            <th style="width:100px;" sort="po.serialNumber">序列号</th>
             <th style="width:70px;" sort="po.orderPrincipal">订单负责人</th>
             <th style="width:60px;" sort="po.assistant">责任助理</th>
-            <th style="width:60px;" sort="po.customerName">客户名称</th>
+            <th style="width:100px;" sort="po.customerName">客户名称</th>
             <th style="width:100px;" >品名1</th>
             <th style="width:60px;" >生产合计</th>
             <th style="width:100px;" >品名2</th>
@@ -60,7 +73,9 @@
             <th style="width:80px;" sort="planWarehouseDate">计划入库时间</th>
             <th style="width:80px;" sort="actualWarehouseDate">实际入库时间</th>
 
-        </tr>
+        </t
+        </thead>
+
         <tbody>
         <c:forEach items="${page.content}" var="m" varStatus="status">
         <input type="hidden" name="pps[${status.index}].id" value="${m.id}">
@@ -117,29 +132,12 @@
         </c:forEach>
         </tbody>
     </table>
-
+    </div>
     </form>
-
     <es:page page="${page}"/>
-      <div class="control-group left-group">
-                <div>
-                        <shiro:hasPermission name="productProgress:update">
-                             <button type="button" id="submit" class="btn btn-primary">
-                                 <i class="icon-edit"></i>
-                                     修改
-                             </button>
-                      </shiro:hasPermission>
-
-                    <c:if test="${type=='summary'}">
-                    <a href="<es:BackURL/>" class="btn">
-                        <i class="icon-reply"></i>
-                        返回
-                    </a>
-                    </c:if>
-                </div>
-            </div>
 </div>
 <es:contentFooter/>
+<script src="${ctx}/static/js/productProgress/edit.js?9" type="text/javascript"></script>
 <script type="text/javascript">
     $(function() {
         $("#submit").click(function(){

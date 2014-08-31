@@ -62,6 +62,7 @@ $(function(){
             });
 
 
+             /**
              $('#purchase .editable').off('hidden');
              $('#purchase .editable').on('hidden', function(e, reason){
                         if(reason === 'save' || reason === 'nochange') {
@@ -71,6 +72,7 @@ $(function(){
                                 }, 300);
                         }
              });
+             **/
              if(op=="查看"){
                  $('.editable').editable('option', 'disabled', true);
                  $(".btn-primary").remove();
@@ -160,10 +162,19 @@ $(function(){
                 var headWidth = [];
                 $(".table-head th").each(function(){
                     headWidth.push($(this).width());
-                })
+                });
                 var content = $(".table-content")[0];
                 $(content).find("td").each(function(index,elem){
                     $(elem).width(headWidth[index]);
+                });
+                $(".ScrollDiv").css("max-height", $(window).height()-320)
+                $(".ScrollDiv").css("min-height", $(window).height()-320)
+
+                //点中高亮
+                 $(".table tr").click(function(){
+                    //移除上一个高亮
+                    $(".active").removeClass("active");
+                    $(this).addClass("active");
                 })
          }
 

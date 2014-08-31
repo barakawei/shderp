@@ -6,6 +6,7 @@
 package shd.purchaseorder.web.controller;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -33,10 +34,16 @@ import ee.common.search.Searchable;
 import ee.common.utils.Constants;
 import ee.common.web.bind.annotation.PageAttribute;
 import ee.common.web.controller.BaseController;
+import shd.common.util.UserContextUtil;
+import shd.common.util.ZipUtil;
 import shd.purchaseorder.entity.Purchase;
 import shd.purchaseorder.entity.PurchaseOrder;
 import shd.purchaseorder.service.PurchaseOrderService;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -48,6 +55,9 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
 
     @Autowired
     private PurchaseOrderService poService;
+
+    @Autowired
+    private UserContextUtil userContextUtil;
 
     public class DataHolder{
         String category;
@@ -71,8 +81,8 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
         }
     }
 
-    @RequestMapping("/{id}/export")
-    public void exportExcel(HttpServletResponse response,@PathVariable("id") Long id) {
+
+    private File export(Long id, HttpServletResponse response,boolean isMulti) {
         PurchaseOrder po = poService.findOne(id);
         List<Purchase> purchaseList = po.getPurchases();
         List<DataHolder> dataHolders = new ArrayList<DataHolder>();
@@ -99,12 +109,13 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
         Map beans = new HashMap();
         beans.put("po", po);
         beans.put("dhs", dataHolders);
-        SimpleDateFormat sdf =new SimpleDateFormat("MM-dd");
-        String date =sdf.format(new Date());
-        String fileName = po.getFileName();
-        if(StringUtils.isBlank(fileName)){
-            fileName = "采购计划_"+date+".xlsx";
+
+        String serial = po.getSerialNumber();
+        if(StringUtils.isEmpty(serial)){
+            serial ="empty";
         }
+        String fileName = "采购总表"+po.getOrderNumber()+"；"+serial+".xlsx";
+
         String template ="purchase.xlsx";
         String classpathResourceUrl = "classpath:/" + template;
         ResourceLoader resourceLoader = new DefaultResourceLoader();
@@ -112,38 +123,81 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
         XLSTransformer transformer=new XLSTransformer();
 
         try {
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-            fileName = fileName.replaceAll("%2B","+");
-            fileName = fileName.replaceAll("%20"," ");
-            fileName = fileName.replaceAll("%2F","/");
-            fileName = fileName.replaceAll("%3F","?");
-            fileName = fileName.replaceAll("%25","%");
-            fileName = fileName.replaceAll("%23","#");
-            fileName = fileName.replaceAll("%26","&");
-            fileName = fileName.replaceAll("%3D","=");
-            fileName = fileName.replaceAll("%3B","；");
-            fileName = fileName.replaceAll("%28","(");
-            fileName = fileName.replaceAll("%29",")");
-            fileName = fileName.replaceAll("%2A","*");
-            fileName = fileName.replaceAll("%2D","-");
-            fileName = fileName.replaceAll("%2C",",");
-            fileName = fileName.replaceAll("%3A",":");
-            fileName = fileName.replaceAll("%5F","_");
-            fileName = fileName.replaceAll("%5C","\\");
-            fileName = fileName.replaceAll("%7E","~");
-            fileName = fileName.replaceAll("%5B","[");
-            fileName = fileName.replaceAll("%5D","]");
-            fileName = fileName.replaceAll("%7C","|");
-            Workbook wb = null;
+            if (!isMulti) {
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+                fileName = fileName.replaceAll("%2B", "+");
+                fileName = fileName.replaceAll("%20", " ");
+                fileName = fileName.replaceAll("%2F", "/");
+                fileName = fileName.replaceAll("%3F", "?");
+                fileName = fileName.replaceAll("%25", "%");
+                fileName = fileName.replaceAll("%23", "#");
+                fileName = fileName.replaceAll("%26", "&");
+                fileName = fileName.replaceAll("%3D", "=");
+                fileName = fileName.replaceAll("%3B", ";");
+                fileName = fileName.replaceAll("%28", "(");
+                fileName = fileName.replaceAll("%29", ")");
+                fileName = fileName.replaceAll("%2A", "*");
+                fileName = fileName.replaceAll("%2D", "-");
+                fileName = fileName.replaceAll("%2C", ",");
+                fileName = fileName.replaceAll("%3A", "；");
+                fileName = fileName.replaceAll("%5F", "_");
+                fileName = fileName.replaceAll("%5C", "\\");
+                fileName = fileName.replaceAll("%7E", "~");
+                fileName = fileName.replaceAll("%5B", "[");
+                fileName = fileName.replaceAll("%5D", "]");
+                fileName = fileName.replaceAll("%7C", "|");
+            }
+            Workbook wb = transformer.transformXLS(resource.getInputStream(), beans);
 
-            wb=transformer.transformXLS(resource.getInputStream(), beans);
-            response.setContentType("APPLICATION/OCTET-STREAM");
-            response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-            ServletOutputStream out=response.getOutputStream();
-            wb.write(out);
-            out.flush();
+            if (isMulti) {
+                File file = new File(fileName);
+                FileOutputStream fo = new FileOutputStream(file);
+                wb.write(fo);
+                fo.flush();
+                return file;
+            } else {
+                response.setContentType("APPLICATION/OCTET-STREAM");
+                response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+                ServletOutputStream out = response.getOutputStream();
+                wb.write(out);
+                out.flush();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    @RequestMapping("/batch/export")
+    public void exportExcel(HttpServletResponse response,@RequestParam(value = "ids", required = false) Long[] ids) {
+        List<File> srcfile = new ArrayList<File>();
+        if(ids!= null && ids.length >1) {
+            for (Long id : ids) {
+                File temp = export(id, response,true);
+                srcfile.add(temp);
+            }
+            String fileName = "报表.zip";
+            File file = new File(fileName);
+            ZipUtil.zipFiles(srcfile, file);
+            try {
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+                InputStream inStream = new FileInputStream(file);
+                response.setContentType("APPLICATION/OCTET-STREAM");
+                response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+                ServletOutputStream out = response.getOutputStream();
+                byte[] b = new byte[100];
+                int len;
+                while ((len = inStream.read(b)) > 0)
+                    out.write(b, 0, len);
+                inStream.close();
+                out.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(ids!= null && ids.length ==1){
+            export(ids[0], response,false);
         }
     }
 
@@ -153,16 +207,28 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
     @RequestMapping(method = RequestMethod.GET)
     @PageAttribute(sort = "id=desc")
     public String list(@CurrentUser User user,Searchable searchable, Model model) {
-
+        boolean isAssistant = userContextUtil.hasJob(user,"责任助理");
+        if(isAssistant){
+            searchable.addSearchParam("po.assistant_eq",user.getUsername());
+        }
         model.addAttribute("page", poService.findAll(searchable));
         return viewName("list");
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String view(Model model, @PathVariable("id") Long id) {
+    @RequestMapping(value = "/{id}/{type}", method = RequestMethod.GET)
+    public String view(Model model, @PathVariable("id") Long id,@PathVariable("type") String type,String method) {
 
         PurchaseOrder po=poService.load(id);
         model.addAttribute("po", po);
+        model.addAttribute("type", type);
+        if(type.equals("all")){
+            model.addAttribute("width", "2850");
+        }else{
+            model.addAttribute("width", "1400");
+        }
+        if("summary".equals(method)){
+            model.addAttribute("method",method);
+        }
         model.addAttribute(Constants.OP_NAME, "查看");
         return viewName("editForm");
     }
@@ -174,6 +240,8 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
         String permission = poService.getEditPermission();
         model.addAttribute("permission",permission);
         model.addAttribute("po",po);
+        model.addAttribute("type", "all");
+        model.addAttribute("width", "2850");
         return viewName("editForm");
     }
 
@@ -201,6 +269,14 @@ public class PurchaseOrderController extends BaseController<PurchaseOrder, Long>
         poService.add(po,jsonData);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "新增成功");
         return redirectToUrl(null);
+    }
+
+    @RequestMapping(value = "{id}/copy", method = RequestMethod.GET)
+    public String copy(@PathVariable("id") Long id,RedirectAttributes redirectAttributes) {
+
+        poService.copy(id);
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "补单成功");
+        return redirectToUrl("/purchaseOrder");
     }
 
     @RequestMapping(value = "{id}/update", method = RequestMethod.POST)

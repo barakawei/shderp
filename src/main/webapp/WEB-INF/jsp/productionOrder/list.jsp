@@ -69,12 +69,20 @@
                 </a>
                 </shiro:hasPermission>
 
-
                 <shiro:hasPermission name="productionOrder:update">
                 <a id="update" class="btn btn-update">
                     <span class="icon-edit"></span>
                     修改
                 </a>
+                 </shiro:hasPermission>
+
+                 </c:if>
+
+                 <shiro:hasPermission name="productionOrder:create">
+                 <a class="btn btn-copy">
+                     <span class="icon-file-alt"></span>
+                    补单
+                 </a>
                  </shiro:hasPermission>
 
                 <shiro:hasPermission name="productionOrder:delete">
@@ -83,8 +91,8 @@
                     删除
                 </a>
                 </shiro:hasPermission>
-                 </c:if>
-                <a id="exportt" class="btn btn-export">
+
+                <a id="export" class="btn btn-export">
                     <span class="icon-edit"></span>
                     导出EXCEL
                 </a>
@@ -95,6 +103,7 @@
             <%@include file="searchForm.jsp" %>
         </div>
     </div>
+    <div class="table-container">
     <table id="table" class="sort-table table table-bordered table-hover" data-prefix-url="${ctx}/productionOrder">
         <thead>
         <tr>
@@ -103,13 +112,14 @@
                 |
                 <a class="reverse-all" href="javascript:;">反选</a>
             </th>
-            <th sort="orderNumber">订单号</th>
-            <th sort="serialNumber">序列号</th>
-            <th sort="customerName">客户名称</th>
-            <th sort="contractDeliveryDate">合同交期</th>
+            <th style="width: 160px;" sort="orderNumber">订单号</th>
+            <th style="width: 160px;" sort="serialNumber">序列号</th>
+            <th style="width: 200px;" sort="customerName">客户名称</th>
+            <th style="width: 100px; sort="contractDeliveryDate">合同交期</th>
             <th sort="status">状态</th>
 
         </tr>
+         </thead>
         <tbody>
         <c:forEach items="${page.content}" var="m">
             <tr>
@@ -153,7 +163,7 @@
         </c:forEach>
         </tbody>
     </table>
+    </div>
     <es:page page="${page}"/>
 </div>
 <es:contentFooter/>
-

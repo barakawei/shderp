@@ -96,10 +96,10 @@
         </span>
         &nbsp;
         <select class="input-small" onchange="$.table.turnPage($(this).val(), ${current}, this);">
-            <option value="10" <c:if test="${pageSize eq 10}">selected="selected" </c:if>>10</option>
-            <option value="20" <c:if test="${pageSize eq 20}">selected="selected" </c:if>>20</option>
-            <option value="30" <c:if test="${pageSize eq 30}">selected="selected" </c:if>>30</option>
-            <option value="50" <c:if test="${pageSize eq 50}">selected="selected" </c:if>>50</option>
+            <option value="100" <c:if test="${pageSize eq 100}">selected="selected" </c:if>>100</option>
+            <option value="200" <c:if test="${pageSize eq 200}">selected="selected" </c:if>>200</option>
+            <option value="300" <c:if test="${pageSize eq 300}">selected="selected" </c:if>>300</option>
+            <option value="500" <c:if test="${pageSize eq 500}">selected="selected" </c:if>>500</option>
         </select>
         <span class="page-info">[共${page.totalPages}页/${page.totalElements}条]</span >
     </div>

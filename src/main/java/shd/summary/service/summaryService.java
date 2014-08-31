@@ -30,13 +30,13 @@ public class SummaryService{
                 "from production_order po \n" +
                 "left join product_progress pp on(po.id = pp.po_id) \n" +
                 "left join organize_progress op on(po.id = op.po_id)\n" +
-                "left join purchase_order puo on(po.order_number = puo.order_number)\n" +
+                "left join purchase_order puo on(po.serial_number = puo.serial_number)\n" +
                 "where po.status = 4\n";
         String countSql ="select count(po.id)\n" +
                 "from production_order po \n" +
                 "left join product_progress pp on(po.id = pp.po_id) \n" +
                 "left join organize_progress op on(po.id = op.po_id)\n" +
-                "left join purchase_order puo on(po.order_number = puo.order_number)\n" +
+                "left join purchase_order puo on(po.serial_number = puo.serial_number)\n" +
                 "where po.status = 4";
         List<Object> result = rh.findByNative(sql,searchable, SearchCallback.DEFAULT);
         List<Summary> summaries = new ArrayList<Summary>();

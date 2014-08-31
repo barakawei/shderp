@@ -19,7 +19,7 @@ public @interface PageAttribute {
      * The default-size the injected {@link org.springframework.data.domain.Pageable} should get if no corresponding
      * parameter defined in request (default is 10).
      */
-    int value() default 10;
+    int value() default 200;
 
     /**
      * The default-pagenumber the injected {@link org.synyx.hades.domain.Pageable} should get if no corresponding

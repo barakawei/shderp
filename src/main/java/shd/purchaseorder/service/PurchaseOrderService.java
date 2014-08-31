@@ -8,16 +8,22 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import ee.common.service.BaseService;
+import ee.sys.user.entity.User;
 import ee.sys.user.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.snaker.engine.entity.Order;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import shd.common.entity.Upload;
+import shd.productionorder.entity.Production;
+import shd.productionorder.entity.ProductionOrder;
 import shd.purchaseorder.entity.Purchase;
 import shd.purchaseorder.entity.PurchaseOrder;
 import shd.purchaseorder.repository.PurchaseOrderRepository;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +37,26 @@ public class PurchaseOrderService extends BaseService<PurchaseOrder, Long> {
     private PurchaseOrderRepository getPurchaseOrderRepository() {
         return (PurchaseOrderRepository) baseRepository;
     }
+
+    public PurchaseOrder copy(Long id){
+        PurchaseOrder old = this.findOne(id);
+        PurchaseOrder _new =new PurchaseOrder();
+        BeanUtils.copyProperties(old, _new, new String[]{"status", "id", "createData", "purchases"});
+        _new.setCreateDate(new Date());
+        _new.setOrderNumber(old.getOrderNumber()+"-补");
+        _new.setSerialNumber(old.getSerialNumber()+"-补");
+        List<Purchase> ps = new ArrayList<>();
+        for (Purchase p : old.getPurchases()) {
+            Purchase _p = new Purchase();
+            BeanUtils.copyProperties(p, _p, new String[]{"id", "po", "createDate"});
+            _p.setCreateDate(new Date());
+            _p.setPo(_new);
+            ps.add(_p);
+        }
+        _new.setPurchases(ps);
+        return baseRepository.save(_new);
+    }
+
 
 
     public PurchaseOrder add(PurchaseOrder po,String json){

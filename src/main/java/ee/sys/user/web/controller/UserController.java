@@ -136,7 +136,16 @@ public class UserController extends BaseCRUDController<User, Long> {
 
         fillUserOrganization(m, organizationIds, jobIds);
 
-        return super.create(model, m, result, redirectAttributes);
+        if (permissionList != null) {
+            this.permissionList.assertHasCreatePermission();
+        }
+
+        if (hasError(m, result)) {
+            return showCreateForm(model);
+        }
+        baseService.save(m);
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "新增成功");
+        return redirectToUrl(null);
     }
 
     private void fillUserOrganization(User m, Long[] organizationIds, Long[][] jobIds) {
@@ -292,6 +301,23 @@ public class UserController extends BaseCRUDController<User, Long> {
         }
 
         return response.result();
+    }
+
+    @RequestMapping(value = "batch/delete", method = {RequestMethod.GET, RequestMethod.POST})
+    public String deleteInBatch(
+            @RequestParam(value = "ids", required = false) Long[] ids,
+            @RequestParam(value = Constants.BACK_URL, required = false) String backURL,
+            RedirectAttributes redirectAttributes) {
+
+
+        if (permissionList != null) {
+            this.permissionList.assertHasDeletePermission();
+        }
+
+        baseService.delete(ids);
+
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "删除成功");
+        return redirectToUrl(backURL);
     }
 
 

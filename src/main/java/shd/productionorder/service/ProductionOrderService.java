@@ -24,15 +24,19 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.StringUtils;
 import shd.common.entity.Dict;
 import shd.common.entity.Upload;
 import shd.common.repository.DictRepository;
 import shd.organizeprogress.entity.OrganizeProgress;
+import shd.organizeprogress.service.OrganizeProgressService;
+import shd.productionorder.entity.ChangeInfo;
 import shd.productionorder.entity.Production;
 import shd.productionorder.entity.ProductionOrder;
 import shd.productionorder.repository.ProductionOrderRepository;
 import ee.common.service.BaseService;
 import shd.productprogress.entity.ProductProgress;
+import shd.productprogress.service.ProductProgressService;
 
 import java.util.*;
 
@@ -53,6 +57,13 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private OrganizeProgressService opService;
+
+    @Autowired
+    private ProductProgressService ppService;
+
     @Autowired
     private ProductionOrderRepository getProductionOrderRepository() {
         return (ProductionOrderRepository) baseRepository;
@@ -67,26 +78,58 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
         return orderIds;
     }
 
+    public ProductionOrder copy(Long id){
+        ProductionOrder old = this.findOne(id);
+        ProductionOrder _new =new ProductionOrder();
+        BeanUtils.copyProperties(old, _new, new String[]{"assistant","salesDirector","salesDirectorAssistant","planManager","status", "id", "createData", "orderId", "fillDate", "op", "pp", "", "uploads", "productions"});
+        _new.setCreateDate(new Date());
+        _new.setStatus(ProductionOrder.STATUS_NEW);
+        _new.setOrderNumber(old.getOrderNumber() + "-补");
+        _new.setSerialNumber(old.getSerialNumber()+"-补");
+        List<Production> pds = new ArrayList<>();
+        for (Production p : old.getProductions()) {
+            Production _p = new Production();
+            BeanUtils.copyProperties(p, _p, new String[]{"id", "po", "createDate"});
+            _p.setCreateDate(new Date());
+            _p.setPo(_new);
+            pds.add(_p);
+        }
+        _new.setProductions(pds);
+        List<Upload> us = new ArrayList<>();
+        for (Upload u : old.getUploads()) {
+            Upload _u = new Upload();
+            BeanUtils.copyProperties(u, _u, new String[]{"id", "po"});
+            _u.setPo(_new);
+            us.add(_u);
+        }
+        _new.setUploads(us);
+        ProductionOrder _po = baseRepository.save(_new);
+        Subject currentUser = SecurityUtils.getSubject();
+        Long userId =Long.valueOf((String)currentUser.getPrincipal());
+        User user = userService.findOne(userId);
+        Order order = this.start(user);
+        _po.setOrderId(order.getId());
+        _po.setAssistant(user.getUsername());
+        return baseRepository.save(_po);
+    }
+
     public ProductionOrder add(ProductionOrder po,String json) {
         List<Production> pds = JSON.parseArray(json, Production.class);
         po.setProductions(pds);
         for (Production p : pds) {
             p.setPo(po);
+            p.setCreateDate(new Date());
         }
 
         List<Upload> us = po.getUploads();
         if (us != null){
             for (Upload u : us) {
                 u.setPo(po);
-                if (ImagesUtils.isImage(u.getName())) {
-                    u.setType("img");
-                } else {
-                    u.setType("doc");
-                }
+                u.setType(StringUtils.split(u.getName(),".")[1]);
             }
         }
         po.setStatus(ProductionOrder.STATUS_NEW);
-
+        po.setCreateDate(new Date());
         ProductionOrder _po = baseRepository.save(po);
         Subject currentUser = SecurityUtils.getSubject();
         Long userId =Long.valueOf((String)currentUser.getPrincipal());
@@ -109,11 +152,7 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
         if(us!=null){
             for(Upload u :us){
                 u.setPo(old);
-                if (ImagesUtils.isImage(u.getName())) {
-                    u.setType("img");
-                }else{
-                    u.setType("doc");
-                }
+                u.setType(StringUtils.split(u.getName(),".")[1]);
             }
             old.getUploads().addAll(us);
         }
@@ -139,12 +178,28 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
 
     public void delete(Long id){
         ProductionOrder po = baseRepository.findOne(id);
-        //只有新建的可以删除
-        if(po.getStatus()==ProductionOrder.STATUS_NEW) {
+        if( po.getProductions()!=null){
             po.getProductions().clear();
+        }
+
+        if(po.getPp() !=null){
+            po.getPp().setPo(null);
+            ppService.delete(po.getPp());
+            po.setPp(null);
+        }
+
+        if( po.getOp()!=null){
+            po.getOp().setPo(null);
+            opService.delete(po.getOp());
+            po.setOp(null);
+        }
+        if( po.getUploads()!=null){
+            po.getUploads().clear();
+        }
+
+
             baseRepository.save(po);
             baseRepository.delete(po);
-        }
     }
 
     public void delete(Long[] ids){
@@ -223,6 +278,14 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
         Subject currentUser = SecurityUtils.getSubject();
         Long userId =Long.valueOf((String)currentUser.getPrincipal());
         User user = userService.findOne(userId);
+
+        List<String> jobList = new ArrayList<>();
+        List<UserOrganizationJob> jobs = user.getOrganizationJobs();
+        for(UserOrganizationJob job:jobs){
+            Job j= jobService.findOne(job.getJobId());
+            jobList.add(j.getName());
+        }
+
         //查询链接单
         for(Long id:ids){
             ProductionOrder po = baseRepository.findOne(id);
@@ -230,7 +293,11 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
             if(null!=po&& (po.getStatus().equals(ProductionOrder.STATUS_SUBMIT))){
                 if(this.rejectTask(po.getOrderId())){
                     po.setStatus(ProductionOrder.STATUS_REJECT);
-                    po.setSalesDirector(user.getUsername()+"(不确认)");
+                    if(jobList.contains("销售总监")) {
+                        po.setSalesDirector(user.getUsername() + "(不确认)");
+                    }else{
+                        po.setSalesDirectorAssistant(user.getUsername() + "(不确认)");
+                    }
                     baseRepository.save(po);
                 }
             }
@@ -256,6 +323,15 @@ public class ProductionOrderService extends BaseService<ProductionOrder, Long> {
                     pp.setPo(po);
                     po.setPp(pp);
                     po.setPlanManager(user.getUsername());
+                    //订单组织计划表 中“订单号”出现“补”“返”字眼，
+                    // 如：WJ20140227补单、CJ20140807返、 HTH20121101补
+                    // “数据计划完成时间	 标准样确认时间”自动生成。
+                    if(po.getOrderNumber() !=null && (po.getOrderNumber().contains("补") ||
+                            po.getOrderNumber().contains("返"))){
+                        op.setDataPlanFinishDate(new Date());
+                        op.setStandardSampleConfirmDate(new Date());
+                    }
+
                     baseRepository.save(po);
                 }
             }

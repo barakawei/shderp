@@ -21,3 +21,14 @@
 body{
     font-family:"微软雅黑,宋体"
 }
+.table-container form{
+    margin:0;
+}
+.table-container table td{
+    word-break:break-all;
+}
+
+.ScrollTableContainer{
+    overflow-x:auto;
+    overflow-y:hidden;
+}
